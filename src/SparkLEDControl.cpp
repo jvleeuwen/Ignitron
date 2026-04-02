@@ -37,7 +37,7 @@ void SparkLEDControl::init() {
     pinMode(LED_NOISEGATE_GPIO, OUTPUT);
     pinMode(LED_COMP_GPIO, OUTPUT);
 
-#ifndef DEDICATED_PRESET_LEDS
+#if !defined(DEDICATED_PRESET_LEDS) && !defined(TFT_DRIVER_ILI9341)
     // For special corner case where the extra dedicated
     // Preset LED hardware *is* connected to the extra
     // GPIO ports, but the define that activates them is
@@ -242,7 +242,7 @@ void SparkLEDControl::allLedOff() {
     digitalWrite(LED_DELAY_GPIO, LOW);
     digitalWrite(LED_REVERB_GPIO, LOW);
 
-#ifndef DEDICATED_PRESET_LEDS
+#if !defined(DEDICATED_PRESET_LEDS) && !defined(TFT_DRIVER_ILI9341)
     // For special corner case where the extra dedicated
     // Preset LED hardware *is* connected to the extra
     // GPIO ports, but the define that activates them is
