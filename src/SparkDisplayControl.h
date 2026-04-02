@@ -11,13 +11,24 @@
 #include "Config_Definitions.h"
 #include <Adafruit_GFX.h>
 
-// Definition of OLED driver in Config_Definitions.h
+
+// Definition of display driver in Config_Definitions.h
 #if defined(OLED_DRIVER_SSD1306)
-#include <Adafruit_SSD1306.h> //https://github.com/adafruit/Adafruit_SSD1306
+#include <Adafruit_SSD1306.h>
 #elif defined(OLED_DRIVER_SH1106) || defined(OLED_DRIVER_SH1107)
-#include <Adafruit_SH110X.h> //https://github.com/adafruit/Adafruit_SH110x
+#include <Adafruit_SH110X.h>
 #define WHITE SH110X_WHITE
 #define BLACK SH110X_BLACK
+#elif defined(TFT_DRIVER_ILI9341)
+#include <Adafruit_ILI9341.h>
+#define WHITE ILI9341_WHITE
+#define BLACK ILI9341_BLACK
+#define RED ILI9341_RED
+#define GREEN ILI9341_GREEN
+#define BLUE ILI9341_BLUE
+#define YELLOW ILI9341_YELLOW
+#define CYAN ILI9341_CYAN
+#define MAGENTA ILI9341_MAGENTA
 #endif
 
 #include "SparkDataControl.h"
@@ -58,6 +69,8 @@ private:
     static Adafruit_SH1106G display_;
 #elif defined(OLED_DRIVER_SH1107)
     static Adafruit_SH1107 display_;
+#elif defined(TFT_DRIVER_ILI9341)
+    static Adafruit_ILI9341 display_;
 #endif
     SparkDataControl *sparkDC_;
 

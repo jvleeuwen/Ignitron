@@ -1,0 +1,66 @@
+( \ PRODUCT
+
+DESCRIPTION
+
+2.4-inch color screen, support 65K color di;
+320X240 resolution, optional touch fi
+Using the SPI serial bus, it only late the display
+Easy to expand the experiment
+Provide a rich sample program
+Military-grade process standards Noi
+Provide underlying driver technical suf
+We Are The Distributor Of
+
+PARAMETERS
+Name | ~ Paameter |
+3 A Display Color MM 7 RGB 65K color M1
+NL" lakh © | havetouch screen: MSP2402 |
+have no touch screen: MSP2401
+Screensize 72 24Gncn) |
+Tye IN
+~~ Diweric
+Resolution ) | 3207240 (Pixel)
+Module Interface 4-wire SPI interface
+Active Area (AA area) | 36.72x48.96(mm) |
+
+Module PCB Size
+Operating Temperature
+Storage Temperature
+
+VCC power voltage
+Logic 10 port voltage
+Power Consumption
+
+uch: 26(g) / With touch: 36(g)
+
+Rough Weight(Package containing;
+
+INTERFACE — Pp
+
+Number Pin Label Description
+1 | VCC | 5V/3.3V power input
+2 GND | Ground
+3 | CS LCD chip select signal, low level enable
+4 RESET | LCD reset signal, low level reset
+
+LCD register / data selection signal,
+
+8 Beas high level: register, low level: data
+
+6 | SDIMOSI) | SPI bus write data signal
+
+7 SCK SPI bus clock signal
+
+Backlight control, high level lighting,
+8 LED
+
+if not controlled, connect 3. ays bright
+
+s |spomiso) ed to the read function, you can
+
+not connect it f TZT Brand In Hong Kong, China
+(The following is the touch screen sj
+module itself does not have touch
+
+TCU | Touch SPI
+T CS Touch scre

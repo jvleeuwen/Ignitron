@@ -7,26 +7,36 @@
 
 #include "SparkDisplayControl.h"
 
-const int SparkDisplayControl::SCREEN_WIDTH = 128;         // Display width
-const int SparkDisplayControl::SCREEN_HEIGHT = 64;         // Display height
-const int SparkDisplayControl::OLED_RESET = -1;            // Reset pin # (or -1 if sharing Arduino reset pin)
-const int SparkDisplayControl::DISPLAY_MIN_X_FACTOR = -12; // for text size 2, scales linearly with text size
+
+#if defined(TFT_DRIVER_ILI9341)
+const int SparkDisplayControl::SCREEN_WIDTH = 320;
+const int SparkDisplayControl::SCREEN_HEIGHT = 240;
+const int SparkDisplayControl::OLED_RESET = 4; // Example, set to your RESET pin
+const int SparkDisplayControl::DISPLAY_MIN_X_FACTOR = -12;
+#else
+const int SparkDisplayControl::SCREEN_WIDTH = 128;
+const int SparkDisplayControl::SCREEN_HEIGHT = 64;
+const int SparkDisplayControl::OLED_RESET = -1;
+const int SparkDisplayControl::DISPLAY_MIN_X_FACTOR = -12;
+#endif
+
 
 #if defined(OLED_DRIVER_SSD1306)
-Adafruit_SSD1306 SparkDisplayControl::display_(SCREEN_WIDTH, SCREEN_HEIGHT,
-                                               &Wire, OLED_RESET);
-SparkDisplayControl::SparkDisplayControl() : SparkDisplayControl(nullptr) {
-}
+Adafruit_SSD1306 SparkDisplayControl::display_(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
+SparkDisplayControl::SparkDisplayControl() : SparkDisplayControl(nullptr) {}
 #elif defined(OLED_DRIVER_SH1106)
-Adafruit_SH1106G SparkDisplayControl::display_(SCREEN_WIDTH, SCREEN_HEIGHT,
-                                               &Wire, OLED_RESET);
-SparkDisplayControl::SparkDisplayControl() : SparkDisplayControl(nullptr) {
-}
+Adafruit_SH1106G SparkDisplayControl::display_(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
+SparkDisplayControl::SparkDisplayControl() : SparkDisplayControl(nullptr) {}
 #elif defined(OLED_DRIVER_SH1107)
-Adafruit_SH1107 SparkDisplayControl::display_(SCREEN_HEIGHT, SCREEN_WIDTH,
-                                              &Wire, OLED_RESET);
-SparkDisplayControl::SparkDisplayControl() : SparkDisplayControl(nullptr) {
-}
+Adafruit_SH1107 SparkDisplayControl::display_(SCREEN_HEIGHT, SCREEN_WIDTH, &Wire, OLED_RESET);
+SparkDisplayControl::SparkDisplayControl() : SparkDisplayControl(nullptr) {}
+#elif defined(TFT_DRIVER_ILI9341)
+// Example pinout, adjust as needed:
+#define TFT_CS   5
+#define TFT_DC   2
+#define TFT_RST  4
+Adafruit_ILI9341 SparkDisplayControl::display_(TFT_CS, TFT_DC, TFT_RST);
+SparkDisplayControl::SparkDisplayControl() : SparkDisplayControl(nullptr) {}
 #endif
 
 SparkDisplayControl::SparkDisplayControl(SparkDataControl *dc) {
@@ -39,35 +49,39 @@ SparkDisplayControl::~SparkDisplayControl() {
 
 void SparkDisplayControl::init(int mode) {
 #if defined(OLED_DRIVER_SSD1306)
-    // SSD1306_SWITCHCAPVCC = generate display voltage from 3.3V internally
-    if (!display_.begin(SSD1306_SWITCHCAPVCC, 0x3C)) { // 0x3C required for this display
+    if (!display_.begin(SSD1306_SWITCHCAPVCC, 0x3C)) {
         Serial.println(F("SSD1306 initialization failed"));
-        for (;;)
-            ; // Loop forever
+        for (;;);
     }
 #elif defined(OLED_DRIVER_SH1106)
-    if (!display_.begin(0x3C, true)) { // 0x3C required for this display
+    if (!display_.begin(0x3C, true)) {
         Serial.println(F("SH1106 initialization failed"));
-        for (;;)
-            ; // Loop forever
+        for (;;);
     }
 #elif defined(OLED_DRIVER_SH1107)
-    if (!display_.begin(0x3C, true)) { // 0x3C required for this display
+    if (!display_.begin(0x3C, true)) {
         Serial.println(F("SH1107 initialization failed"));
-        for (;;)
-            ; // Loop forever
+        for (;;);
     }
     display_.setRotation(1);
+#elif defined(TFT_DRIVER_ILI9341)
+    display_.begin();
+    display_.setRotation(1); // Landscape
+    display_.fillScreen(BLACK);
 #endif
     initKeyboardLayoutStrings();
+#ifndef TFT_DRIVER_ILI9341
     // Clear the buffer
     display_.clearDisplay(); // No Adafruit splash
     display_.display();
+#endif
     display_.setTextColor(WHITE);
     display_.setTextWrap(false);
 
     showInitialMessage();
+#ifndef TFT_DRIVER_ILI9341
     display_.display();
+#endif
     if (sparkDC_->operationMode() == SPARK_MODE_KEYBOARD) {
         // Allow the initial screen to show for some time
         delay(2000);
@@ -705,7 +719,11 @@ void SparkDisplayControl::update(bool isInitBoot) {
 
     OperationMode opMode = sparkDC_->operationMode();
     SubMode subMode = sparkDC_->subMode();
+#ifndef TFT_DRIVER_ILI9341
     display_.clearDisplay();
+#else
+    display_.fillScreen(BLACK);
+#endif
     checkInvertDisplay(subMode);
 
     if ((opMode == SPARK_MODE_APP) && isInitBoot) {
@@ -758,7 +776,9 @@ void SparkDisplayControl::update(bool isInitBoot) {
         }
     }
     // logDisplay();
+#ifndef TFT_DRIVER_ILI9341
     display_.display();
+#endif
 }
 
 void SparkDisplayControl::updateTextPositions() {
