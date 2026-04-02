@@ -84,17 +84,21 @@ void setup() {
 void loop() {
     static bool bootSplashShown = false;
     static bool waitingScreenDrawn = false;
+    static unsigned long bootSplashTimestamp = 0;
+    const unsigned long bootSplashDurationMs = 1500;
 
     // Methods to call only in APP mode
     if (operationMode == SPARK_MODE_APP) {
         while (!(spark_dc.checkBLEConnection())) {
-            if (!waitingScreenDrawn) {
-                if (spark_dc.isInitBoot() && !bootSplashShown) {
-                    sparkDisplay.update(true);
-                    bootSplashShown = true;
-                } else {
-                    sparkDisplay.update(false);
-                }
+            if (spark_dc.isInitBoot() && !bootSplashShown) {
+                // Show splash once at boot.
+                sparkDisplay.update(true);
+                bootSplashShown = true;
+                bootSplashTimestamp = millis();
+            } else if (!waitingScreenDrawn &&
+                       (!spark_dc.isInitBoot() || millis() - bootSplashTimestamp >= bootSplashDurationMs)) {
+                // Then render the normal waiting screen once (HW/BLE/preset).
+                sparkDisplay.update(false);
                 waitingScreenDrawn = true;
             }
             spark_led.updateLEDs();
@@ -117,6 +121,7 @@ void loop() {
             spark_dc.isInitBoot() = false;
             bootSplashShown = false;
             waitingScreenDrawn = false;
+            bootSplashTimestamp = 0;
             // spark_dc.configureLooper();
         }
     }
