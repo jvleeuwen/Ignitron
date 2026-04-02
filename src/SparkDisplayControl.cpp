@@ -706,6 +706,13 @@ void SparkDisplayControl::showVolumeBar() {
 }
 
 void SparkDisplayControl::checkInvertDisplay(int subMode) {
+#ifdef TFT_DRIVER_ILI9341
+    // ILI9341 hardware inversion can make the TFT appear fully white in some modes.
+    invertedDisplay = false;
+    display_.invertDisplay(false);
+    return;
+#endif
+
     switch (subMode) {
     case SUB_MODE_FX:
         invertedDisplay = true;
