@@ -82,13 +82,20 @@ void setup() {
 }
 
 void loop() {
+    static bool bootSplashShown = false;
 
     // Methods to call only in APP mode
     if (operationMode == SPARK_MODE_APP) {
         while (!(spark_dc.checkBLEConnection())) {
-            sparkDisplay.update(spark_dc.isInitBoot());
+            if (spark_dc.isInitBoot() && !bootSplashShown) {
+                sparkDisplay.update(true);
+                bootSplashShown = true;
+            } else {
+                sparkDisplay.update(false);
+            }
             spark_led.updateLEDs();
             spark_bh.readButtons();
+            delay(60);
         }
 
         // After connection is established, continue.
@@ -102,6 +109,7 @@ void loop() {
             // delay(100);
             // spark_dc.getCurrentPresetFromSpark();
             spark_dc.isInitBoot() = false;
+            bootSplashShown = false;
             // spark_dc.configureLooper();
         }
     }
