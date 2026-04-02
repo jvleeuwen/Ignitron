@@ -737,7 +737,8 @@ void SparkDisplayControl::update(bool isInitBoot) {
 #ifndef TFT_DRIVER_ILI9341
     display_.clearDisplay();
 #else
-    display_.fillScreen(BLACK);
+    // UI layout is drawn in a 128x64 region; clearing only that area avoids TFT flicker.
+    display_.fillRect(0, 0, 128, 64, BLACK);
 #endif
     checkInvertDisplay(subMode);
 
