@@ -7,10 +7,12 @@
 | CS         | GPIO5      | 29                        |
 | RESET      | GPIO4      | 24                        |
 | DC         | GPIO2      | 22                        |
-| SDI(MOSI)  | GPIO23     | 36                        |
-| SCK        | GPIO18     | 30                        |
+| SDI(MOSI)  | GPIO21     | 33                        |
+| SCK        | GPIO22     | 36                        |
 | LED        | 3.3V       | 1 (3V3)                   |
 | SDO(MISO)  | (NC)       | (not connected)           |
+
+Note: In this project, GPIO18 and GPIO23 are used by button/LED logic, so the TFT SPI bus is mapped to GPIO22 (SCK) and GPIO21 (MOSI).
 
 - Always connect to the correct GPIO number, not just the physical pin number.
 - If your ESP32 board has pin numbers printed, match them to the GPIO numbers above.
@@ -24,8 +26,8 @@ flowchart TD
         CS[GPIO5 Pin 29]
         RESET[GPIO4 Pin 24]
         DC[GPIO2 Pin 22]
-        MOSI[GPIO23 Pin 36]
-        SCK[GPIO18 Pin 30]
+        MOSI[GPIO21 Pin 33]
+        SCK[GPIO22 Pin 36]
         LED[3V3 Pin 1]
     end
     subgraph TFT_ILI9341

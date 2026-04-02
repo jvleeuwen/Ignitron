@@ -38,6 +38,8 @@ SparkDisplayControl::SparkDisplayControl() : SparkDisplayControl(nullptr) {}
 #define TFT_CS   5
 #define TFT_DC   2
 #define TFT_RST  4
+#define TFT_SCK  22
+#define TFT_MOSI 21
 Adafruit_ILI9341 SparkDisplayControl::display_(TFT_CS, TFT_DC, TFT_RST);
 SparkDisplayControl::SparkDisplayControl() : SparkDisplayControl(nullptr) {}
 #endif
@@ -68,8 +70,8 @@ void SparkDisplayControl::init(int mode) {
     }
     display_.setRotation(1);
 #elif defined(TFT_DRIVER_ILI9341)
-    // Explicitly initialize VSPI pins used by most ESP32 DevKit boards.
-    SPI.begin(18, -1, 23, TFT_CS);
+    // Use non-conflicting SPI pins (GPIO18/GPIO23 are used by button/LED logic).
+    SPI.begin(TFT_SCK, -1, TFT_MOSI, TFT_CS);
     // Use a conservative SPI clock for better cable/module compatibility.
     display_.begin(10000000);
     display_.setRotation(1); // Landscape
