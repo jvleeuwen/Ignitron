@@ -83,20 +83,26 @@ void setup() {
 
 void loop() {
     static bool bootSplashShown = false;
+    static bool waitingScreenDrawn = false;
 
     // Methods to call only in APP mode
     if (operationMode == SPARK_MODE_APP) {
         while (!(spark_dc.checkBLEConnection())) {
-            if (spark_dc.isInitBoot() && !bootSplashShown) {
-                sparkDisplay.update(true);
-                bootSplashShown = true;
-            } else {
-                sparkDisplay.update(false);
+            if (!waitingScreenDrawn) {
+                if (spark_dc.isInitBoot() && !bootSplashShown) {
+                    sparkDisplay.update(true);
+                    bootSplashShown = true;
+                } else {
+                    sparkDisplay.update(false);
+                }
+                waitingScreenDrawn = true;
             }
             spark_led.updateLEDs();
             spark_bh.readButtons();
             delay(60);
         }
+
+        waitingScreenDrawn = false;
 
         // After connection is established, continue.
         //  On first boot, get the amp type and set the preset to Hardware setting 1.
@@ -110,6 +116,7 @@ void loop() {
             // spark_dc.getCurrentPresetFromSpark();
             spark_dc.isInitBoot() = false;
             bootSplashShown = false;
+            waitingScreenDrawn = false;
             // spark_dc.configureLooper();
         }
     }
