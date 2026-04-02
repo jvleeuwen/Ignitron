@@ -6,6 +6,9 @@
  */
 
 #include "SparkDisplayControl.h"
+#if defined(TFT_DRIVER_ILI9341)
+#include <SPI.h>
+#endif
 
 
 #if defined(TFT_DRIVER_ILI9341)
@@ -65,7 +68,10 @@ void SparkDisplayControl::init(int mode) {
     }
     display_.setRotation(1);
 #elif defined(TFT_DRIVER_ILI9341)
-    display_.begin();
+    // Explicitly initialize VSPI pins used by most ESP32 DevKit boards.
+    SPI.begin(18, -1, 23, TFT_CS);
+    // Use a conservative SPI clock for better cable/module compatibility.
+    display_.begin(10000000);
     display_.setRotation(1); // Landscape
     display_.fillScreen(BLACK);
 #endif
