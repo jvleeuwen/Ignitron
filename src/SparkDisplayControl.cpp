@@ -14,7 +14,7 @@
 #if defined(TFT_DRIVER_ILI9341)
 const int SparkDisplayControl::SCREEN_WIDTH = 320;
 const int SparkDisplayControl::SCREEN_HEIGHT = 240;
-const int SparkDisplayControl::OLED_RESET = 4; // Example, set to your RESET pin
+const int SparkDisplayControl::OLED_RESET = -1;
 const int SparkDisplayControl::DISPLAY_MIN_X_FACTOR = -12;
 #else
 const int SparkDisplayControl::SCREEN_WIDTH = 128;
@@ -34,7 +34,6 @@ SparkDisplayControl::SparkDisplayControl() : SparkDisplayControl(nullptr) {}
 Adafruit_SH1107 SparkDisplayControl::display_(SCREEN_HEIGHT, SCREEN_WIDTH, &Wire, OLED_RESET);
 SparkDisplayControl::SparkDisplayControl() : SparkDisplayControl(nullptr) {}
 #elif defined(TFT_DRIVER_ILI9341)
-// Example pinout, adjust as needed:
 #define TFT_CS   5
 #define TFT_DC   2
 #define TFT_RST  4

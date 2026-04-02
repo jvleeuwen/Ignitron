@@ -15,8 +15,6 @@
 using namespace std;
 
 // Device Info Definitions
-const string DEVICE_NAME = "Ignitron";
-
 // Control classes
 SparkDataControl spark_dc;
 SparkButtonHandler spark_bh;
@@ -24,12 +22,6 @@ SparkLEDControl spark_led;
 SparkDisplayControl sparkDisplay;
 SparkPresetControl &presetControl = SparkPresetControl::getInstance();
 
-unsigned long lastInitialPresetTimestamp = 0;
-unsigned long currentTimestamp = 0;
-int initialRequestInterval = 3000;
-
-// Check for initial boot
-bool isInitBoot;
 OperationMode operationMode = SPARK_MODE_APP;
 
 /////////////////////////////////////////////////////////
