@@ -7,6 +7,27 @@
 
 #include "SparkBTControl.h"
 
+namespace {
+const char *bleFrameDirection(const ByteVector &blk) {
+    if (blk.size() >= 6 && blk[4] == 0x53 && blk[5] == 0xFE) {
+        return "to-spark";
+    }
+    if (blk.size() >= 6 && blk[4] == 0x41 && blk[5] == 0xFF) {
+        return "from-spark";
+    }
+    return "unknown";
+}
+
+void logBleFrame(const char *tag, const ByteVector &blk) {
+    Serial.printf("[ble] %s len=%u dir=%s hdr=%02X%02X\n",
+                  tag,
+                  static_cast<unsigned int>(blk.size()),
+                  bleFrameDirection(blk),
+                  blk.size() > 4 ? blk[4] : 0x00,
+                  blk.size() > 5 ? blk[5] : 0x00);
+}
+}
+
 bool SparkBTControl::isAppConnectedSerial_ = false;
 
 // ClientCallbacks SparkBTControl::clientCB;
@@ -239,6 +260,7 @@ bool SparkBTControl::writeBLE(ByteVector &cmd, bool withDelay, bool response) {
                     if (cut_point > 0) {
                         send_cmd.assign(cmd.begin(), cmd.begin() + cut_point);
                         cmd.assign(cmd.begin() + cut_point, cmd.end());
+                        logBleFrame("ign->amp", send_cmd);
                         return_value = characteristic->writeValue(send_cmd.data(), send_cmd.size(), response);
                     }
                 }
@@ -394,6 +416,7 @@ void SparkBTControl::onWrite(NimBLECharacteristic *pCharacteristic) {
         for (int i = 0; i < rxValue.length(); i++) {
             byteVector.push_back((byte)(rxValue[i]));
         }
+        logBleFrame("app->ign", byteVector);
     }
     // Add message to Queue for processing
     spark_dc_->queueMessage(byteVector);
@@ -428,6 +451,7 @@ void SparkBTControl::notifyClients(const vector<CmdData> &msg) {
                 SPARK_BLE_NOTIF_CHAR_UUID);
             if (characteristic) {
                 for (auto block : msg) {
+                    logBleFrame("ign->app", block.data);
                     /*DEBUG_PRINTLN("Sending data:");
                     DEBUG_PRINTVECTOR(block);
                     DEBUG_PRINTLN();*/

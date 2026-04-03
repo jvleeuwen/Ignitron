@@ -223,6 +223,8 @@ private:
     // keep track which HW presets have been read so far
     static bool isInitBoot_;
     static bool displayDirty_;
+    static bool hasPendingAppRequest_;
+    static byte pendingAppRequestMsgNum_;
     static byte specialMsgNum;
 
     static byte nextMessageNum;

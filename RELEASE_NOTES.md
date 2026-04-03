@@ -1,5 +1,13 @@
 # Release Notes
 
+## 1.9.1.15 - 2026-04-03
+- Added targeted APP-mode BLE bridge diagnostics for app writes, amp writes, amp notifications, parser outcomes, and app notifications.
+- New logs make it possible to correlate each bridge step and see whether a response was forwarded, ignored, or never arrived.
+
+## 1.9.1.14 - 2026-04-03
+- Restricted APP-mode response forwarding so the Spark app only receives amp responses that match app-originated requests.
+- Prevents unsolicited Ignitron background amp traffic from being pushed to the app and destabilizing the BLE session.
+
 ## 1.9.1.13 - 2026-04-03
 - Forwarded completed amp-originated messages and acknowledgments back to Spark app in APP mode.
 - Completes the APP-mode BLE bridge path so Spark app receives responses instead of timing out after subscribe.

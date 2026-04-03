@@ -7,6 +7,46 @@
 
 #include "SparkDataControl.h"
 
+namespace {
+const char *bridgeBool(bool value) {
+    return value ? "yes" : "no";
+}
+
+const char *bridgeProcessStatusName(MessageProcessStatus status) {
+    switch (status) {
+    case MSG_PROCESS_RES_NONE:
+        return "none";
+    case MSG_PROCESS_RES_ONGOING:
+        return "ongoing";
+    case MSG_PROCESS_RES_REQUEST:
+        return "request";
+    case MSG_PROCESS_RES_COMPLETE:
+        return "complete";
+    default:
+        return "unknown";
+    }
+}
+
+const char *bridgeDirectionName(const ByteVector &blk) {
+    if (blk.size() >= 6 && blk[4] == 0x53 && blk[5] == 0xFE) {
+        return "to-spark";
+    }
+    if (blk.size() >= 6 && blk[4] == 0x41 && blk[5] == 0xFF) {
+        return "from-spark";
+    }
+    return "unknown";
+}
+
+void logBridgeFrameSummary(const char *tag, const ByteVector &blk) {
+    Serial.printf("[bridge] %s len=%u dir=%s hdr=%02X%02X\n",
+                  tag,
+                  static_cast<unsigned int>(blk.size()),
+                  bridgeDirectionName(blk),
+                  blk.size() > 4 ? blk[4] : 0x00,
+                  blk.size() > 5 ? blk[5] : 0x00);
+}
+}
+
 SparkBTControl *SparkDataControl::bleControl = nullptr;
 SparkStreamReader SparkDataControl::sparkSsr;
 SparkStatus &SparkDataControl::statusObject = SparkStatus::getInstance();
@@ -52,6 +92,8 @@ BatteryLevel SparkDataControl::batteryLevel_ = BATTERY_LEVEL_0;
 
 bool SparkDataControl::isInitBoot_ = true;
 bool SparkDataControl::displayDirty_ = true;
+bool SparkDataControl::hasPendingAppRequest_ = false;
+byte SparkDataControl::pendingAppRequestMsgNum_ = 0x00;
 byte SparkDataControl::specialMsgNum = 0xEE;
 
 SparkDataControl::SparkDataControl() {
@@ -443,25 +485,60 @@ void SparkDataControl::processSparkData(ByteVector &blk) {
     // Check if incoming message requires sending an acknowledgment
     handleSendingAck(blk);
 
+    if (operationMode_ == SPARK_MODE_APP) {
+        logBridgeFrameSummary("process input", blk);
+    }
+
     bool isMessageToSpark = blk.size() >= 6 && blk[4] == 0x53 && blk[5] == 0xFE;
     bool isMessageFromSpark = blk.size() >= 6 && blk[4] == 0x41 && blk[5] == 0xFF;
 
     MessageProcessStatus retCode = sparkSsr.processBlock(blk);
+    if (operationMode_ == SPARK_MODE_APP && retCode != MSG_PROCESS_RES_NONE) {
+        Serial.printf("[bridge] parsed status=%s type=%d msg=%02X pending=%s pendingMsg=%02X\n",
+                      bridgeProcessStatusName(retCode),
+                      statusObject.lastMessageType(),
+                      statusObject.lastMessageNum(),
+                      bridgeBool(hasPendingAppRequest_),
+                      pendingAppRequestMsgNum_);
+    }
     if (retCode == MSG_PROCESS_RES_REQUEST && operationMode_ == SPARK_MODE_AMP) {
         handleAmpModeRequest();
     }
     if (retCode == MSG_PROCESS_RES_REQUEST && operationMode_ == SPARK_MODE_APP) {
         // In APP mode, requests arriving from Spark app via BLE server must be forwarded to the amp.
         vector<CmdData> appRequest = sparkSsr.lastMessage();
+        pendingAppRequestMsgNum_ = statusObject.lastMessageNum();
+        hasPendingAppRequest_ = true;
+        Serial.printf("[bridge] app request captured msg=%02X chunks=%u type=%d\n",
+                      pendingAppRequestMsgNum_,
+                      static_cast<unsigned int>(appRequest.size()),
+                      statusObject.lastMessageType());
         for (auto &chunk : appRequest) {
             ByteVector data = chunk.data;
+            logBridgeFrameSummary("forward app->amp", data);
             bleControl->writeBLE(data, true, false);
         }
     }
     if (retCode == MSG_PROCESS_RES_COMPLETE) {
-        if (operationMode_ == SPARK_MODE_APP && isMessageFromSpark) {
-            // Forward completed amp responses/ACKs back to Spark app.
+        if (operationMode_ == SPARK_MODE_APP && isMessageFromSpark &&
+            hasPendingAppRequest_ && statusObject.lastMessageNum() == pendingAppRequestMsgNum_) {
+            // Forward only amp responses that correspond to an actual app-originated request.
+            Serial.printf("[bridge] forwarding amp response to app msg=%02X chunks=%u type=%d\n",
+                          statusObject.lastMessageNum(),
+                          static_cast<unsigned int>(sparkSsr.lastMessage().size()),
+                          statusObject.lastMessageType());
             bleControl->notifyClients(sparkSsr.lastMessage());
+            hasPendingAppRequest_ = false;
+        } else if (operationMode_ == SPARK_MODE_APP && isMessageFromSpark) {
+            Serial.printf("[bridge] ignoring amp response msg=%02X type=%d pending=%s pendingMsg=%02X\n",
+                          statusObject.lastMessageNum(),
+                          statusObject.lastMessageType(),
+                          bridgeBool(hasPendingAppRequest_),
+                          pendingAppRequestMsgNum_);
+        } else if (operationMode_ == SPARK_MODE_APP && isMessageToSpark) {
+            Serial.printf("[bridge] completed app-originated message msg=%02X type=%d\n",
+                          statusObject.lastMessageNum(),
+                          statusObject.lastMessageType());
         }
         handleAppModeResponse();
     }
@@ -994,6 +1071,13 @@ void SparkDataControl::bleNotificationCallback(
     // Triggered when data is received from Spark Amp in APP mode
     //  Transform data into ByteVetor and process
     ByteVector chunk(&pData[0], &pData[length]);
+    if (operationMode_ == SPARK_MODE_APP) {
+        Serial.printf("[bridge] amp notify len=%u notify=%s uuid=%s\n",
+                      static_cast<unsigned int>(length),
+                      isNotify ? "yes" : "no",
+                      pRemoteCharacteristic ? pRemoteCharacteristic->getUUID().toString().c_str() : "unknown");
+        logBridgeFrameSummary("amp->ign", chunk);
+    }
     // DEBUG_PRINT("Incoming block: ");
     // DEBUG_PRINTVECTOR(chunk);
     // DEBUG_PRINTLN();
