@@ -108,73 +108,45 @@ void SparkBTControl::startScan() {
 }
 
 bool SparkBTControl::connectToServer() {
-    /** Check if we have a client we should reuse first **/
-    if (NimBLEDevice::getClientListSize()) {
-        /** Special case when we already know this device, we send false as the
-         second argument in connect() to prevent refreshing the service database.
-         This saves considerable time and power.
-         */
-        client_ = NimBLEDevice::getClientByPeerAddress(advDevice_->getAddress());
-        if (client_) {
-            if (!client_->connect(advDevice_, false)) {
-                Serial.println("Reconnect failed");
-                isAmpConnected_ = false;
-                return false;
-            }
-            Serial.println("Reconnected client");
-        }
-        /** We don't already have a client that knows this device,
-         we will check for a client that is disconnected that we can use.
-         */
-        else {
-            client_ = NimBLEDevice::getDisconnectedClient();
-        }
+    if (!advDevice_) {
+        Serial.println("No advertised Spark device selected");
+        isAmpConnected_ = false;
+        return false;
     }
 
-    /** No client to reuse? Create a new one. */
-    if (!client_) {
-        if (NimBLEDevice::getClientListSize() >= NIMBLE_MAX_CONNECTIONS) {
-            Serial.println(
-                "Max clients reached - no more connections available");
-            isAmpConnected_ = false;
-            return false;
-        }
-
-        client_ = NimBLEDevice::createClient();
-
-        client_->setClientCallbacks(this, false);
-        /** Set initial connection parameters: These settings are 15ms interval, 0 latency, 120ms timout.
-         These settings are safe for 3 clients to connect reliably, can go faster if you have less
-         connections. Timeout should be a multiple of the interval, minimum is 100ms.
-         Min interval: 12 * 1.25ms = 15, Max interval: 12 * 1.25ms = 15, 0 latency, 51 * 10ms = 510ms timeout
-         */
-        // client_->setConnectionParams(12, 12, 0, 51);
-        client_->setConnectionParams(18, 30, 0, 600);
-        /** Set how long we are willing to wait for the connection to complete (seconds), default is 30. */
-        client_->setConnectTimeout(30);
-        client_->getMTU();
-        if (!client_->connect(advDevice_)) {
-            /** Created a client but failed to connect, don't need to keep it as it has no data */
-            NimBLEDevice::deleteClient(client_);
-            Serial.println("Failed to connect, deleted client");
-            isAmpConnected_ = false;
-            return false;
-        }
+    // Always connect with a fresh client to avoid stale/mismatched peers after
+    // failed reconnect attempts when the amp was already powered before Ignitron.
+    if (client_) {
+        NimBLEDevice::deleteClient(client_);
+        client_ = nullptr;
     }
 
-    if (!client_->isConnected()) {
-        if (!client_->connect(advDevice_)) {
-            Serial.println("Failed to connect");
-            isAmpConnected_ = false;
-            return false;
-        }
+    if (NimBLEDevice::getClientListSize() >= NIMBLE_MAX_CONNECTIONS) {
+        Serial.println("Max clients reached - no more connections available");
+        isAmpConnected_ = false;
+        return false;
+    }
+
+    client_ = NimBLEDevice::createClient();
+    client_->setClientCallbacks(this, false);
+    client_->setConnectionParams(18, 30, 0, 600);
+    client_->setConnectTimeout(30);
+    client_->getMTU();
+
+    if (!client_->connect(advDevice_)) {
+        NimBLEDevice::deleteClient(client_);
+        client_ = nullptr;
+        Serial.println("Failed to connect, deleted client");
+        isAmpConnected_ = false;
+        return false;
     }
 
     Serial.print("Connected to: ");
     Serial.println(client_->getPeerAddress().toString().c_str());
     if (!advDevice_ || !client_->getPeerAddress().equals(advDevice_->getAddress())) {
-        Serial.println("Connected peer does not match selected Spark candidate, disconnecting");
-        client_->disconnect();
+        Serial.println("Connected peer does not match selected Spark candidate, rejecting client");
+        NimBLEDevice::deleteClient(client_);
+        client_ = nullptr;
         isAmpConnected_ = false;
         return false;
     }

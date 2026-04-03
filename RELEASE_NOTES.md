@@ -1,5 +1,10 @@
 # Release Notes
 
+## 1.9.1.32 - 2026-04-03
+- Hardened APP-mode BLE amp connect flow by always using a fresh client for each selected Spark candidate and rejecting mismatched peers without disconnect/re-scan churn, reducing startup crash loops when amp is already on.
+- Improved tuner exit stability by adding a short post-off block before raw 25-byte tuner-control frames can re-arm Ignitron auto-enter, preventing immediate tuner re-entry after leaving tuner in Spark app.
+- Fixed large-screen tuner center-note rendering by removing the blank special-case mapping for note value `0x0e` so note letters are shown consistently.
+
 ## 1.9.1.31 - 2026-04-03
 - Fixed APP-mode startup preset sync so Ignitron no longer restores and pushes the last cached preset to the amp on boot; it now reads the amp's current preset instead, preventing unintended CH2 -> CH1 changes.
 - Hardened BLE client connect/subscribe flow to reject mismatched peer addresses before notification subscription, avoiding crashes when a bogus scanned peer is returned after a failed connection attempt.

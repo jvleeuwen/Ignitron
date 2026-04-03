@@ -228,6 +228,7 @@ private:
     static unsigned long lastTunerRequestMs_;
     static const unsigned long tunerRequestAutoEnterWindowMs_;
     static unsigned long lastTunerOffMs_;
+    static const unsigned long tunerArmBlockAfterOffMs_;
     static const unsigned long tunerOutputReopenBlockMs_;
     static deque<byte> pendingAppRequestMsgNums_;
     static byte specialMsgNum;

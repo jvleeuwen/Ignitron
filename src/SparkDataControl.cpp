@@ -120,6 +120,7 @@ bool SparkDataControl::tunerAutoEnterArmed_ = false;
 unsigned long SparkDataControl::lastTunerRequestMs_ = 0;
 const unsigned long SparkDataControl::tunerRequestAutoEnterWindowMs_ = 3000;
 unsigned long SparkDataControl::lastTunerOffMs_ = 0;
+const unsigned long SparkDataControl::tunerArmBlockAfterOffMs_ = 5000;
 const unsigned long SparkDataControl::tunerOutputReopenBlockMs_ = 1200;
 deque<byte> SparkDataControl::pendingAppRequestMsgNums_ = {};
 byte SparkDataControl::specialMsgNum = 0xEE;
@@ -538,8 +539,12 @@ void SparkDataControl::processSparkData(ByteVector &blk) {
         // always classified as a dedicated parsed request type. Arm tuner auto-enter
         // from this raw frame pattern so following tuner output can switch the UI.
         if (blk.size() == 25) {
-            tunerAutoEnterArmed_ = true;
-            lastTunerRequestMs_ = millis();
+            unsigned long nowMs = millis();
+            bool recentlyTurnedOff = (lastTunerOffMs_ > 0) && ((nowMs - lastTunerOffMs_) < tunerArmBlockAfterOffMs_);
+            if (!recentlyTurnedOff) {
+                tunerAutoEnterArmed_ = true;
+                lastTunerRequestMs_ = nowMs;
+            }
         }
         ByteVector appBlock = blk;
         bleControl->writeBLE(appBlock, true, false);

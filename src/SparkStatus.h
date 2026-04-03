@@ -111,8 +111,6 @@ public:
     float &measure() { return measure_; }
 
     const string noteString() const {
-        if (note_ == 0x0e)
-            return " ";
         return notes[note_ % 12];
     }
 
