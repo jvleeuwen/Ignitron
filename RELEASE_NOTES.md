@@ -1,5 +1,11 @@
 # Release Notes
 
+## 1.9.1.10 - 2026-04-03
+- Fixed amp connection crash during notification subscription (`NimBLEClient::getService`) by hardening client/descriptor checks.
+- Added self-advertisement filtering during BLE scan to avoid self-connect loops.
+- Fixed APP-mode BLE connection success flow to only mark connected after notification subscription succeeds.
+- Repaired malformed BLE callback block and restored correct `startServer()` implementation.
+
 ## 1.9.1.8 - 2026-04-03
 - Adjusted BLE server app-connect callback to avoid scan state changes during iOS GATT setup.
 - Added unsubscribe diagnostic logging with amp-connection status to help trace Spark app disconnect cause.

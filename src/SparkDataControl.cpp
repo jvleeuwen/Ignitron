@@ -926,10 +926,13 @@ bool SparkDataControl::checkBLEConnection() {
     }
     if (bleControl->isConnectionFound()) {
         if (bleControl->connectToServer()) {
-            bleControl->subscribeToNotifications(&bleNotificationCallback);
-            Serial.println("BLE connection to Spark established.");
-            // delay(2000);
-            return true;
+            if (bleControl->subscribeToNotifications(&bleNotificationCallback)) {
+                Serial.println("BLE connection to Spark established.");
+                return true;
+            }
+            Serial.println("Failed to subscribe, restarting scan");
+            bleControl->startScan();
+            return false;
         } else {
             Serial.println("Failed to connect, starting scan");
             bleControl->startScan();

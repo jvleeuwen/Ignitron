@@ -154,7 +154,7 @@ bool SparkBTControl::subscribeToNotifications(notify_callback notifyCallback) {
     NimBLERemoteService *service = nullptr;
     NimBLERemoteCharacteristic *characteristic = nullptr;
 
-    if (client_) {
+    if (client_ && client_->isConnected()) {
         service = client_->getService(SPARK_BLE_SERVICE_UUID);
         if (service) { // make sure it's not null
             characteristic = service->getCharacteristic(SPARK_BLE_NOTIF_CHAR_UUID);
@@ -166,7 +166,10 @@ bool SparkBTControl::subscribeToNotifications(notify_callback notifyCallback) {
                         SPARK_BLE_NOTIF_CHAR_UUID.c_str());
                     Serial.println("Notifications turned on");
                     // Descriptor 2902 needs to be activated in order to receive notifications
-                    characteristic->getDescriptor(BLEUUID((uint16_t)0x2902))->writeValue(kNotificationOn, 2, true);
+                    NimBLERemoteDescriptor *descriptor = characteristic->getDescriptor(BLEUUID((uint16_t)0x2902));
+                    if (descriptor) {
+                        descriptor->writeValue(kNotificationOn, 2, true);
+                    }
                     // Subscribing to Spark characteristic
                     if (!characteristic->subscribe(true, notifyCB_)) {
                         Serial.println("Subscribe failed, disconnecting");
@@ -276,17 +279,17 @@ bool SparkBTControl::writeBLE(ByteVector &cmd, bool withDelay, bool response) {
 
 void SparkBTControl::onResult(NimBLEAdvertisedDevice *advertisedDevice) {
 
+    // Ignore our own advertisement to prevent self-connection loops/crashes.
+    if (advertisedDevice->getAddress().equals(NimBLEDevice::getAddress())) {
+        return;
+    }
+
     if (advertisedDevice->isAdvertisingService(
             NimBLEUUID(SPARK_BLE_SERVICE_UUID))) {
         Serial.println("Found Spark, connecting.");
-        /** stop scan before connecting */
-        // Commented as workaround, might need to get back here, is currently with DataControl;
         NimBLEDevice::getScan()->stop();
-        /** Save the device reference in a global for the client to use*/
         setAdvertisedDevice(advertisedDevice);
-        /** Ready to connect now */
         isConnectionFound_ = true;
-        // delay(500);
     }
 }
 
