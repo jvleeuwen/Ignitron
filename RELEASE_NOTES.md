@@ -1,5 +1,9 @@
 # Release Notes
 
+## 1.9.1.20 - 2026-04-03
+- Added raw APP-mode passthrough of all app-originated Spark frames to the amp, not only request packets.
+- Fixes missing bridge forwarding for control commands (such as tuner and preset/effect changes) that left the app connected but did not update amp state.
+
 ## 1.9.1.19 - 2026-04-03
 - Fixed APP-mode amp-response forwarding to send original raw Spark BLE frame blocks to the Spark app instead of parsed payload chunks.
 - Resolves malformed app notifications (`ign->app` with invalid headers) that caused the app to unsubscribe/disconnect after initial requests.

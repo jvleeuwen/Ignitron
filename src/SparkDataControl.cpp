@@ -511,6 +511,14 @@ void SparkDataControl::processSparkData(ByteVector &blk) {
     bool isMessageToSpark = blk.size() >= 6 && blk[4] == 0x53 && blk[5] == 0xFE;
     bool isMessageFromSpark = blk.size() >= 6 && blk[4] == 0x41 && blk[5] == 0xFF;
 
+    if (operationMode_ == SPARK_MODE_APP && isMessageToSpark) {
+        // Bridge app-originated Spark protocol frames directly to amp so all command types
+        // (requests and control writes like tuner/preset/effect updates) are forwarded.
+        logBridgeFrameSummary("passthrough app->amp", blk);
+        ByteVector appBlock = blk;
+        bleControl->writeBLE(appBlock, true, false);
+    }
+
     MessageProcessStatus retCode = sparkSsr.processBlock(blk);
     if (operationMode_ == SPARK_MODE_APP) {
         Serial.printf("[bridge] parsed status=%s type=%d msg=%02X pending=%s pendingMsg=%02X\n",
@@ -547,9 +555,7 @@ void SparkDataControl::processSparkData(ByteVector &blk) {
         for (auto &chunk : appRequest) {
             ByteVector data = chunk.data;
             logBridgeFrameSummary("forward app->amp", data);
-            if (requestType != MSG_REQ_72) {
-                bleControl->writeBLE(data, true, false);
-            }
+            // Requests are already forwarded via raw passthrough above.
         }
     }
     if (retCode == MSG_PROCESS_RES_COMPLETE) {
