@@ -108,6 +108,8 @@ private:
 
     int lastUpdateCheck = 0;
     int updateInterval = 3000;
+    unsigned long lastPresetSwitchMs_ = 0;
+    const unsigned long backgroundSyncPauseAfterSwitchMs_ = 2500;
 
     SparkPresetBuilder presetBuilder;
     SparkDataControl *sparkDC;

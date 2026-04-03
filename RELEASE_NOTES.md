@@ -1,5 +1,9 @@
 # Release Notes
 
+## 1.9.1.36 - 2026-04-03
+- Improved immediate profile visibility after connect/preset changes by pausing background missing-HW-preset sync briefly after a preset switch event.
+- Reduced background HW cache synchronization burst load by requesting only one missing HW preset per sync cycle instead of iterating all missing presets in one pass.
+
 ## 1.9.1.35 - 2026-04-03
 - Fixed APP-mode startup crash (`std::vector::at` out-of-range) caused by invalid preset index `0` reaching hardware-preset cache lookup during preset-number update handling.
 - Added defensive preset-index validation in preset builder and ignored invalid Spark preset-number updates (< 1) before triggering hardware-preset activation logic.

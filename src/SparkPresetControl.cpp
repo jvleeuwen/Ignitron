@@ -57,6 +57,12 @@ void SparkPresetControl::getMissingHWPresets() {
         return;
     }
 
+    // Avoid background cache reads right after a user/amp preset switch,
+    // otherwise foreground profile updates can feel delayed.
+    if (lastPresetSwitchMs_ > 0 && (currentTime - lastPresetSwitchMs_) < backgroundSyncPauseAfterSwitchMs_) {
+        return;
+    }
+
     // Check for HW presets
     if (currentTime - lastUpdateCheck > updateInterval) {
         lastUpdateCheck = currentTime;
@@ -76,7 +82,9 @@ void SparkPresetControl::getMissingHWPresets() {
                     // if (presetBuilder.isHWPresetMissing(num)) {
                     DEBUG_PRINTF("%d is missing.\n", num);
                     sparkDC->readHWPreset(num);
-                    delay(500);
+                    // Request one missing preset per cycle to avoid bursts.
+                    isAnyMissing = true;
+                    break;
                 }
                 isAnyMissing = isAnyMissing || isCurrentMissing;
             }
@@ -315,10 +323,15 @@ bool SparkPresetControl::switchPreset(int pre, bool isInitial) {
         activePresetNum_ = pre;
     }*/
 
+    if (retValue) {
+        lastPresetSwitchMs_ = millis();
+    }
     return retValue;
 }
 
 void SparkPresetControl::updateFromSparkResponseHWPreset(int presetNum) {
+
+    lastPresetSwitchMs_ = millis();
 
     // activePreset_ = statusObject.currentPreset();
     Preset newPreset = presetBuilder.getPreset(activeBank_, presetNum);
