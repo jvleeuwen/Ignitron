@@ -53,15 +53,40 @@ public:
     }
 
 private:
-    // OLED Screen config
-
+    // Display config
     static const int SCREEN_WIDTH;         // Display width
     static const int SCREEN_HEIGHT;        // Display height
     static const int OLED_RESET;           // Reset pin # (or -1 if sharing Arduino reset pin)
     static const int DISPLAY_MIN_X_FACTOR; // for text size 2, scales linearly with text size
 
+    // Scaling factors for responsive layout
+#if defined(TFT_DRIVER_ILI9341)
+    // Use full TFT resolution
+    const float displayScaleY_ = 240.0 / 64.0;     // Height scale: 3.75x
+    const float displayScaleX_ = 320.0 / 128.0;    // Width scale: 2.5x
+    const int baseTextSize1_ = 1;                  // Scale up text accordingly
+    const int baseTextSize2_ = 2;
+    const int baseTextSize3_ = 3;
+    const int baseTextSize4_ = 4;
+#else
+    // OLED: use native resolution
+    const float displayScaleY_ = 1.0;
+    const float displayScaleX_ = 1.0;
+    const int baseTextSize1_ = 1;
+    const int baseTextSize2_ = 2;
+    const int baseTextSize3_ = 3;
+    const int baseTextSize4_ = 4;
+#endif
+
     const int kSplashImageWidth = 128;
     const int kSplashImageHeight = 47;
+    
+    // Helper function to scale Y coordinates
+    inline int scaleY(int y) { return (int)(y * displayScaleY_); }
+    // Helper function to scale X coordinates
+    inline int scaleX(int x) { return (int)(x * displayScaleX_); }
+    // Helper function to scale dimensions
+    inline int scaleDim(int dim) { return max(1, (int)(dim * displayScaleY_)); }
 
 #if defined(OLED_DRIVER_SSD1306)
     static Adafruit_SSD1306 display_;
