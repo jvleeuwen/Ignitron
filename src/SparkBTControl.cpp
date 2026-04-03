@@ -448,10 +448,17 @@ void SparkBTControl::onConnect(NimBLEServer *pServer_,
                                ble_gap_conn_desc *desc) {
     isAppConnectedBLE_ = true;
     Serial.println("Spark app connected to Ignitron BLE server");
-    // Reduce radio contention: stop active scanning while app is connected.
-    if (NimBLEDevice::getScan()->isScanning()) {
-        NimBLEDevice::getScan()->stop();
-        Serial.println("Stopped scan while app is connected");
+    // Keep/continue scan if amp is not connected yet, otherwise the app can time out waiting for bridge responses.
+    if (isAmpConnected_) {
+        if (NimBLEDevice::getScan()->isScanning()) {
+            NimBLEDevice::getScan()->stop();
+            Serial.println("Stopped scan: app and amp already connected");
+        }
+    } else {
+        if (!NimBLEDevice::getScan()->isScanning()) {
+            startScan();
+            Serial.println("Started scan: waiting for amp while app connected");
+        }
     }
 }
 

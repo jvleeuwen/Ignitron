@@ -1,5 +1,10 @@
 # Release Notes
 
+## 1.9.1.7 - 2026-04-03
+- Fixed iOS Spark app disconnect loop where app subscribed and then disconnected if amp was not yet connected.
+- Updated BLE server connect flow to keep/start amp scan while app is connected but amp is still offline.
+- Stop scan only when both app and amp links are active to reduce radio contention safely.
+
 ## 1.9.1.6 - 2026-04-03
 - Improved iOS Spark app connection stability by stopping active BLE scan when app connects to Ignitron server.
 - Removed immediate re-advertise-on-connect behavior that could destabilize app connections.
