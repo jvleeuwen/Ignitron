@@ -1,5 +1,9 @@
 # Release Notes
 
+## 1.9.1.18 - 2026-04-03
+- Paused background missing-HW-preset sync while Spark app is connected in APP mode.
+- Reduces handshake and request/response contention that can cause the app to unsubscribe/disconnect during startup.
+
 ## 1.9.1.17 - 2026-04-03
 - Fixed APP-mode request forwarding to rebuild valid amp requests from parsed Spark app request types instead of sending empty payloads.
 - Replaced single pending-request tracking with multi-request tracking so back-to-back app startup requests can be matched to amp responses correctly.

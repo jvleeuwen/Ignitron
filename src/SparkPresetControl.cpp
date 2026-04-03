@@ -51,6 +51,12 @@ Preset SparkPresetControl::getPreset(int bank, int pre) {
 void SparkPresetControl::getMissingHWPresets() {
     int currentTime = millis();
 
+    // Do not run background preset sync while Spark app is actively connected,
+    // otherwise APP-mode handshake requests can be delayed by large preset transfers.
+    if (sparkDC->isAppConnected()) {
+        return;
+    }
+
     // Check for HW presets
     if (currentTime - lastUpdateCheck > updateInterval) {
         lastUpdateCheck = currentTime;
