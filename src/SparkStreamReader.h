@@ -45,6 +45,7 @@ private:
     // indicator if a block received is the last one
     bool msgLastBlock = false;
     vector<ByteVector> response;
+    vector<ByteVector> lastResponse_;
 
     byte lastReadByte;
     const byte endMarker = 0xF7;
@@ -98,6 +99,7 @@ public:
     // setting the messag so it can be structured and interpreted
     void setMessage(const vector<ByteVector> &msg_);
     const vector<CmdData> lastMessage() const { return message; }
+    const vector<ByteVector> &lastResponse() const { return lastResponse_; }
 
     string getJson();
 

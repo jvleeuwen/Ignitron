@@ -54,6 +54,17 @@ void logBridgeFrameSummary(const char *tag, const ByteVector &blk) {
                   blk.size() > 4 ? blk[4] : 0x00,
                   blk.size() > 5 ? blk[5] : 0x00);
 }
+
+vector<CmdData> rawBlocksToCmdData(const vector<ByteVector> &rawBlocks) {
+    vector<CmdData> msg;
+    msg.reserve(rawBlocks.size());
+    for (const auto &block : rawBlocks) {
+        CmdData chunk;
+        chunk.data = block;
+        msg.push_back(chunk);
+    }
+    return msg;
+}
 }
 
 SparkBTControl *SparkDataControl::bleControl = nullptr;
@@ -544,12 +555,14 @@ void SparkDataControl::processSparkData(ByteVector &blk) {
     if (retCode == MSG_PROCESS_RES_COMPLETE) {
         if (operationMode_ == SPARK_MODE_APP && isMessageFromSpark &&
             hasPendingAppRequestMsg(pendingAppRequestMsgNums_, statusObject.lastMessageNum())) {
+            vector<ByteVector> rawBlocks = sparkSsr.lastResponse();
+            vector<CmdData> appResponse = rawBlocksToCmdData(rawBlocks);
             // Forward only amp responses that correspond to an actual app-originated request.
             Serial.printf("[bridge] forwarding amp response to app msg=%02X chunks=%u type=%d\n",
                           statusObject.lastMessageNum(),
-                          static_cast<unsigned int>(sparkSsr.lastMessage().size()),
+                          static_cast<unsigned int>(appResponse.size()),
                           statusObject.lastMessageType());
-            bleControl->notifyClients(sparkSsr.lastMessage());
+            bleControl->notifyClients(appResponse);
             clearPendingAppRequestMsg(pendingAppRequestMsgNums_, statusObject.lastMessageNum());
         } else if (operationMode_ == SPARK_MODE_APP && isMessageFromSpark) {
             Serial.printf("[bridge] ignoring amp response msg=%02X type=%d pending=%s pendingMsg=%02X\n",

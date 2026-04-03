@@ -1036,6 +1036,7 @@ MessageProcessStatus SparkStreamReader::processBlock(ByteVector &blk) {
     // Process data if the block just analyzed was the last
     if (msgLastBlock) {
         msgLastBlock = false;
+        lastResponse_ = response;
         setMessage(response);
         DEBUG_PRINT("Message received: ");
         for (auto chunk : response) {

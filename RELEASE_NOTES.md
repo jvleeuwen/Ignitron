@@ -1,5 +1,9 @@
 # Release Notes
 
+## 1.9.1.19 - 2026-04-03
+- Fixed APP-mode amp-response forwarding to send original raw Spark BLE frame blocks to the Spark app instead of parsed payload chunks.
+- Resolves malformed app notifications (`ign->app` with invalid headers) that caused the app to unsubscribe/disconnect after initial requests.
+
 ## 1.9.1.18 - 2026-04-03
 - Paused background missing-HW-preset sync while Spark app is connected in APP mode.
 - Reduces handshake and request/response contention that can cause the app to unsubscribe/disconnect during startup.
