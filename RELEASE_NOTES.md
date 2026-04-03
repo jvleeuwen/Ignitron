@@ -1,5 +1,10 @@
 # Release Notes
 
+## 1.9.1.6 - 2026-04-03
+- Improved iOS Spark app connection stability by stopping active BLE scan when app connects to Ignitron server.
+- Removed immediate re-advertise-on-connect behavior that could destabilize app connections.
+- On app disconnect, advertising restarts and amp scan resumes only when needed.
+
 ## 1.9.1.5 - 2026-04-03
 - Added and initialized `RELEASE_NOTES.md`.
 - Established per-change release note tracking for each subversion update.

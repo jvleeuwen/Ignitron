@@ -447,9 +447,12 @@ void SparkBTControl::notifyClients(const vector<CmdData> &msg) {
 void SparkBTControl::onConnect(NimBLEServer *pServer_,
                                ble_gap_conn_desc *desc) {
     isAppConnectedBLE_ = true;
-    Serial.println("Multi-connect support: start advertising");
-    //	pServer->updateConnParams(desc->conn_handle, 40, 80, 5, 51);
-    NimBLEDevice::startAdvertising();
+    Serial.println("Spark app connected to Ignitron BLE server");
+    // Reduce radio contention: stop active scanning while app is connected.
+    if (NimBLEDevice::getScan()->isScanning()) {
+        NimBLEDevice::getScan()->stop();
+        Serial.println("Stopped scan while app is connected");
+    }
 }
 
 // APP mode
@@ -465,6 +468,10 @@ void SparkBTControl::onDisconnect(NimBLEServer *pServer_) {
     notificationCount = 0;
     Serial.println("Start advertising");
     NimBLEDevice::startAdvertising();
+    // If amp client is not connected yet, resume scanning for it.
+    if (!isAmpConnected_ && !NimBLEDevice::getScan()->isScanning()) {
+        startScan();
+    }
 }
 
 // APP mode when Amp is disconnected
