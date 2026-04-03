@@ -1,5 +1,9 @@
 # Release Notes
 
+## 1.9.1.26 - 2026-04-03
+- Fixed APP-mode tuner entry regression where Ignitron did not enter tuner mode if Spark app/amp only emitted tuner output (`03 64`) without an explicit tuner-on event (`03 65 on`).
+- Added a short cooldown after tuner-off so trailing tuner-output packets do not immediately re-open tuner mode.
+
 ## 1.9.1.25 - 2026-04-03
 - Fixed APP-mode tuner exit behavior where late tuner-output frames could force Ignitron back into tuner submode after tuner was turned off in Spark app.
 - Tuner submode is now toggled only by explicit tuner on/off messages.

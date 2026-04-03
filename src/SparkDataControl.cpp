@@ -112,6 +112,8 @@ BatteryLevel SparkDataControl::batteryLevel_ = BATTERY_LEVEL_0;
 
 bool SparkDataControl::isInitBoot_ = true;
 bool SparkDataControl::displayDirty_ = true;
+unsigned long SparkDataControl::lastTunerOffMs_ = 0;
+const unsigned long SparkDataControl::tunerOutputReopenBlockMs_ = 1200;
 deque<byte> SparkDataControl::pendingAppRequestMsgNums_ = {};
 byte SparkDataControl::specialMsgNum = 0xEE;
 
@@ -983,9 +985,15 @@ void SparkDataControl::handleAppModeResponse() {
         }
 
         if (lastMessageType == MSG_TYPE_TUNER_OUTPUT) {
-            // Tuner output frames can still arrive briefly after tuner-off.
-            // Do not switch submode here; only explicit tuner on/off messages
-            // should toggle tuner mode.
+            // Some amp/app combinations do not emit an explicit tuner-on event.
+            // Enter tuner mode from tuner output unless we just processed tuner-off.
+            unsigned long nowMs = millis();
+            bool recentlyTurnedOff = (lastTunerOffMs_ > 0) && ((nowMs - lastTunerOffMs_) < tunerOutputReopenBlockMs_);
+            if (subMode_ != SUB_MODE_TUNER && !recentlyTurnedOff) {
+                Serial.println("Tuner output received, entering tuner mode.");
+                subMode_ = SUB_MODE_TUNER;
+                SparkPresetControl::getInstance().updatePendingWithActive();
+            }
             if (subMode_ == SUB_MODE_TUNER) {
                 displayDirty_ = true;
             }
@@ -993,6 +1001,7 @@ void SparkDataControl::handleAppModeResponse() {
 
         if (lastMessageType == MSG_TYPE_TUNER_ON) {
             Serial.println("Tuner on received.");
+            lastTunerOffMs_ = 0;
             subMode_ = SUB_MODE_TUNER;
             SparkPresetControl::getInstance().updatePendingWithActive();
             displayDirty_ = true;
@@ -1000,6 +1009,7 @@ void SparkDataControl::handleAppModeResponse() {
 
         if (lastMessageType == MSG_TYPE_TUNER_OFF) {
             Serial.println("Tuner off received.");
+            lastTunerOffMs_ = millis();
             subMode_ = SUB_MODE_PRESET;
             SparkPresetControl::getInstance().updatePendingWithActive();
             displayDirty_ = true;
