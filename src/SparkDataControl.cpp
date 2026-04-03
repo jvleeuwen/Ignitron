@@ -876,7 +876,9 @@ void SparkDataControl::handleAppModeResponse() {
             DEBUG_PRINTLN("Last message was amp name.");
             sparkAmpName = statusObject.ampName();
             setAmpParameters();
-            getHWChecksums();
+            if (!bleControl->isAppConnected()) {
+                getHWChecksums();
+            }
             printMessage = true;
             // ampNameReceived_ = true;
         }
@@ -884,7 +886,9 @@ void SparkDataControl::handleAppModeResponse() {
         if (lastMessageType == MSG_TYPE_AMP_SERIAL) {
             DEBUG_PRINTLN("Last message was serial number.");
             // reading HW checksums for cache
-            getAmpName();
+            if (!bleControl->isAppConnected()) {
+                getAmpName();
+            }
             printMessage = true;
         }
 
@@ -894,7 +898,7 @@ void SparkDataControl::handleAppModeResponse() {
             presetControl.validateChecksums(statusObject.hwChecksums());
             // try to load last selected preset from filesystem,
             // if not available, read current preset from amp
-            if (!presetControl.readLastPresetFromFile()) {
+            if (!bleControl->isAppConnected() && !presetControl.readLastPresetFromFile()) {
                 getCurrentPresetFromSpark();
             };
         }

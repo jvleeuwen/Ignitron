@@ -313,13 +313,26 @@ void SparkBTControl::onResult(NimBLEAdvertisedDevice *advertisedDevice) {
         return;
     }
 
-    if (advertisedDevice->isAdvertisingService(
+    if (!advertisedDevice->isAdvertisingService(
             NimBLEUUID(SPARK_BLE_SERVICE_UUID))) {
-        Serial.println("Found Spark, connecting.");
-        NimBLEDevice::getScan()->stop();
-        setAdvertisedDevice(advertisedDevice);
-        isConnectionFound_ = true;
+        return;
     }
+
+    string name = advertisedDevice->haveName() ? advertisedDevice->getName() : "";
+    // Filter out unknown/invalid candidates that advertise FFC0 but are not Spark amps.
+    if (name.length() == 0 || name.find("Spark") == string::npos || name == btNameBle) {
+        Serial.printf("Skipping candidate %s (name: %s)\n",
+                      advertisedDevice->getAddress().toString().c_str(),
+                      name.c_str());
+        return;
+    }
+
+    Serial.printf("Found Spark candidate %s (%s), connecting.\n",
+                  advertisedDevice->getAddress().toString().c_str(),
+                  name.c_str());
+    NimBLEDevice::getScan()->stop();
+    setAdvertisedDevice(advertisedDevice);
+    isConnectionFound_ = true;
 }
 
 void SparkBTControl::startServer() {

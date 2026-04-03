@@ -1,5 +1,9 @@
 # Release Notes
 
+## 1.9.1.21 - 2026-04-03
+- Hardened BLE scan candidate selection to skip empty-name/non-Spark candidates that falsely advertise the Spark service UUID and can crash notification subscription.
+- Disabled local APP-mode auto-sync requests (amp name/checksum/current-preset fetches) while Spark app is connected to reduce bridge contention and app disconnects.
+
 ## 1.9.1.20 - 2026-04-03
 - Added raw APP-mode passthrough of all app-originated Spark frames to the amp, not only request packets.
 - Fixes missing bridge forwarding for control commands (such as tuner and preset/effect changes) that left the app connected but did not update amp state.
