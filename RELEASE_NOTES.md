@@ -1,5 +1,9 @@
 # Release Notes
 
+## 1.9.1.30 - 2026-04-03
+- Fixed APP-mode Ignitron tuner entry by arming tuner auto-enter from the raw 25-byte app control frames that precede tuner output, instead of relying only on parsed request classification.
+- Matches the actual Spark app tuner-start traffic pattern seen in logs where tuner output was forwarded correctly but Ignitron never switched into tuner mode.
+
 ## 1.9.1.29 - 2026-04-03
 - Replaced the APP-mode tuner auto-entry timing heuristic with an explicit arm/disarm state: tuner output can open Ignitron tuner only after a fresh app tuner request, and explicit tuner-off now disarms further re-entry until the next tuner request.
 - Removed the incorrect preset-response-based tuner exit fallback.

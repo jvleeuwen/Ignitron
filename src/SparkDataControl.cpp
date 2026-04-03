@@ -534,6 +534,13 @@ void SparkDataControl::processSparkData(ByteVector &blk) {
         if (kVerboseBridgeLogs) {
             logBridgeFrameSummary("passthrough app->amp", blk);
         }
+        // Spark app tuner enable uses repeated 25-byte control frames that are not
+        // always classified as a dedicated parsed request type. Arm tuner auto-enter
+        // from this raw frame pattern so following tuner output can switch the UI.
+        if (blk.size() == 25) {
+            tunerAutoEnterArmed_ = true;
+            lastTunerRequestMs_ = millis();
+        }
         ByteVector appBlock = blk;
         bleControl->writeBLE(appBlock, true, false);
     }
