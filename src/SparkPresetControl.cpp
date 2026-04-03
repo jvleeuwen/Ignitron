@@ -108,6 +108,10 @@ void SparkPresetControl::checkForUpdates(int operationMode) {
         int sparkPresetNumber = statusObject.currentPresetNumber();
         if (pendingBank_ == 0 && sparkPresetNumber >= 1) {
             DEBUG_PRINTLN("Preset number has changed, updating active preset");
+            // Use the Spark-reported preset number directly so HW selection does
+            // not depend on stale pending values from prior bank/preset state.
+            pendingPresetNum_ = ((sparkPresetNumber - 1) % PRESETS_PER_BANK) + 1;
+            pendingHWBank_ = (sparkPresetNumber - 1) / PRESETS_PER_BANK;
             setActiveHWPreset();
         } else if (pendingBank_ == 0) {
             Serial.printf("Ignoring invalid Spark preset number %d\n", sparkPresetNumber);
@@ -334,7 +338,7 @@ void SparkPresetControl::updateFromSparkResponseHWPreset(int presetNum) {
     lastPresetSwitchMs_ = millis();
 
     // activePreset_ = statusObject.currentPreset();
-    Preset newPreset = presetBuilder.getPreset(activeBank_, presetNum);
+    Preset newPreset = presetBuilder.getPreset(0, presetNum);
     if (newPreset.isEmpty) {
         Serial.println("Preset number changed, preset not cached, getting current preset from Spark");
         sparkDC->getCurrentPresetFromSpark();

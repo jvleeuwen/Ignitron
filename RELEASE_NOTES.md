@@ -1,5 +1,9 @@
 # Release Notes
 
+## 1.9.1.37 - 2026-04-03
+- Fixed slower profile metadata updates when switching to HW preset 1 by making HW preset update paths use the Spark-reported preset number directly instead of relying on stale pending preset state.
+- Fixed hardware-preset cache lookup during HW preset responses to always read from the HW bank (`bank 0`), preventing delayed fallbacks to extra preset fetches.
+
 ## 1.9.1.36 - 2026-04-03
 - Improved immediate profile visibility after connect/preset changes by pausing background missing-HW-preset sync briefly after a preset switch event.
 - Reduced background HW cache synchronization burst load by requesting only one missing HW preset per sync cycle instead of iterating all missing presets in one pass.
