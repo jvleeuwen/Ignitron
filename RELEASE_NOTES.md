@@ -1,5 +1,9 @@
 # Release Notes
 
+## 1.9.1.8 - 2026-04-03
+- Adjusted BLE server app-connect callback to avoid scan state changes during iOS GATT setup.
+- Added unsubscribe diagnostic logging with amp-connection status to help trace Spark app disconnect cause.
+
 ## 1.9.1.7 - 2026-04-03
 - Fixed iOS Spark app disconnect loop where app subscribed and then disconnected if amp was not yet connected.
 - Updated BLE server connect flow to keep/start amp scan while app is connected but amp is still offline.

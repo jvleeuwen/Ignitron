@@ -405,6 +405,9 @@ void SparkBTControl::onSubscribe(NimBLECharacteristic *pCharacteristic,
     str += string(pCharacteristic->getUUID());
 
     Serial.println(str.c_str());
+    if (subValue == 0) {
+        Serial.printf("Subscription ended. Amp connected: %s\n", isAmpConnected_ ? "yes" : "no");
+    }
 };
 
 void SparkBTControl::notifyClients(const vector<CmdData> &msg) {
@@ -448,18 +451,10 @@ void SparkBTControl::onConnect(NimBLEServer *pServer_,
                                ble_gap_conn_desc *desc) {
     isAppConnectedBLE_ = true;
     Serial.println("Spark app connected to Ignitron BLE server");
-    // Keep/continue scan if amp is not connected yet, otherwise the app can time out waiting for bridge responses.
-    if (isAmpConnected_) {
-        if (NimBLEDevice::getScan()->isScanning()) {
-            NimBLEDevice::getScan()->stop();
-            Serial.println("Stopped scan: app and amp already connected");
-        }
-    } else {
-        if (!NimBLEDevice::getScan()->isScanning()) {
-            startScan();
-            Serial.println("Started scan: waiting for amp while app connected");
-        }
-    }
+    // Do not change scan state here; toggling scan during GATT setup can cause iOS disconnects.
+    Serial.printf("Amp connected: %s, scanning: %s\n",
+                  isAmpConnected_ ? "yes" : "no",
+                  NimBLEDevice::getScan()->isScanning() ? "yes" : "no");
 }
 
 // APP mode
