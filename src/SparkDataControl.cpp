@@ -443,6 +443,9 @@ void SparkDataControl::processSparkData(ByteVector &blk) {
     // Check if incoming message requires sending an acknowledgment
     handleSendingAck(blk);
 
+    bool isMessageToSpark = blk.size() >= 6 && blk[4] == 0x53 && blk[5] == 0xFE;
+    bool isMessageFromSpark = blk.size() >= 6 && blk[4] == 0x41 && blk[5] == 0xFF;
+
     MessageProcessStatus retCode = sparkSsr.processBlock(blk);
     if (retCode == MSG_PROCESS_RES_REQUEST && operationMode_ == SPARK_MODE_AMP) {
         handleAmpModeRequest();
@@ -456,6 +459,10 @@ void SparkDataControl::processSparkData(ByteVector &blk) {
         }
     }
     if (retCode == MSG_PROCESS_RES_COMPLETE) {
+        if (operationMode_ == SPARK_MODE_APP && isMessageFromSpark) {
+            // Forward completed amp responses/ACKs back to Spark app.
+            bleControl->notifyClients(sparkSsr.lastMessage());
+        }
         handleAppModeResponse();
     }
 

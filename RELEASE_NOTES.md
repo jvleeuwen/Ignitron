@@ -1,5 +1,9 @@
 # Release Notes
 
+## 1.9.1.13 - 2026-04-03
+- Forwarded completed amp-originated messages and acknowledgments back to Spark app in APP mode.
+- Completes the APP-mode BLE bridge path so Spark app receives responses instead of timing out after subscribe.
+
 ## 1.9.1.12 - 2026-04-03
 - Added APP-mode request forwarding from Spark app BLE server path to Spark amp BLE client path.
 - Prevents Spark app timeout/disconnect after subscribe caused by missing request bridge handling.
