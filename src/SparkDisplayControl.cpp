@@ -123,6 +123,10 @@ void SparkDisplayControl::showBankAndPresetNum() {
     display_.setTextColor(WHITE);
     display_.setTextSize(baseTextSize4_);
 
+    // Clear only the small number regions to avoid global flicker.
+    display_.fillRect(0, 0, scaleX(28), scaleY(30), BLACK);
+    display_.fillRect(display_.width() - scaleX(28), 0, scaleX(28), scaleY(30), BLACK);
+
     SparkPresetControl &presetControl = SparkPresetControl::getInstance();
     int pendingBank = presetControl.pendingBank();
 
@@ -372,6 +376,9 @@ void SparkDisplayControl::showLooperTimer() {
 
 void SparkDisplayControl::showModeModifier() {
 
+    // Clear mode marker region before redraw (M/*/L/C)
+    display_.fillRect(display_.width() - scaleX(52), 0, scaleX(52), scaleY(30), BLACK);
+
     display_.setCursor(scaleX(display_.width() - 48), 0);
 
     // Preset display
@@ -414,6 +421,9 @@ void SparkDisplayControl::showConnection() {
     int yPosSymbol = scaleY(9);
     int symbolWidth = 15;
     int symbolHeight = 17;
+
+    // Clear only the connection widget area (text + icon)
+    display_.fillRect(xPosSymbol - scaleX(4), 0, scaleX(30), scaleY(28), BLACK);
 
     int xPosText = xPosSymbol;
     int yPosText = 0;
@@ -762,9 +772,6 @@ void SparkDisplayControl::update(bool isInitBoot) {
         subMode == SUB_MODE_TUNER) {
         // Full redraw modes
         display_.fillRect(0, 0, scaleX(128), scaleY(64), BLACK);
-    } else {
-        // Regular APP/AMP mode: top band is dynamic; middle/bottom are cleared in their own draw methods.
-        display_.fillRect(0, 0, scaleX(128), scaleY(30), BLACK);
     }
 #endif
     checkInvertDisplay(subMode);

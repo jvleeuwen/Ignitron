@@ -49,7 +49,7 @@ const string VERSION = "1.9.1";
 // When battery is full, VoltageOnADCPin = 12.6V / (5.1k + 15k) * 5.1k ~= 3.197V < 3.3V,
 // so this voltage divider setting is suitable for this need.
 
-#define ENABLE_BATTERY_STATUS_INDICATOR
+// #define ENABLE_BATTERY_STATUS_INDICATOR
 
 enum BatteryLevel {
     BATTERY_LEVEL_0,           // 0-10%
