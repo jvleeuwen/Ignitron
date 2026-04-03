@@ -1,4 +1,62 @@
-gsip: 0, SPIWP:0xee
+igsip: 0, SPIWP:0xee
+clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+mode:DIO, clock div:2
+load:0x3fff0030,len:1184
+load:0x40078000,len:13232
+load:0x40080400,len:3028
+entry 0x400805e4
+Initializing
+Operation mode (boot): 1
+Reading opmode file.
+Spark mode config file does not exist.
+Initializing PresetBuilder
+Reading custom presets from filesystem.
+Initializing APP modeStarting NimBLE Server
+Advertising Started
+Starting scan
+Operation mode: 1
+======= Entering APP mode =======
+Initialization done.
+Found Spark candidate f7:eb:ed:5b:38:23 ( Spark 40 BLE), connecting.
+Scan ended.
+Failed to connect, deleted client
+Failed to connect, starting scan
+Resetting Status
+deserializeJson() failed with code IncompleteInput
+Checksum not found, trying legacy format.
+Scan initiated
+Connected to: 73:65:72:50:22:7b
+Guru Meditation Error: Core  1 panic'ed (LoadProhibited). Exception was unhandled.
+
+Core  1 register dump:
+PC      : 0x4009118c  PS      : 0x00060430  A0      : 0x800f78a4  A1      : 0x3ffcf970  
+A2      : 0x3ffcf9a4  A3      : 0x00e319d4  A4      : 0x00000018  A5      : 0x3ffcf9a4  
+A6      : 0x00000019  A7      : 0x00000001  A8      : 0x00000000  A9      : 0x00000000  
+A10     : 0x0000ffc0  A11     : 0x00000000  A12     : 0x00000001  A13     : 0xffffff9f  
+A14     : 0x00000009  A15     : 0x0fffffff  SAR     : 0x00000014  EXCCAUSE: 0x0000001c  
+EXCVADDR: 0x00e319d4  LBEG    : 0x4009118c  LEND    : 0x400911a2  LCOUNT  : 0x00000000  
+
+
+Backtrace: 0x40091189:0x3ffcf970 0x400f78a1:0x3ffcf980 0x400f6154:0x3ffcf9a0 0x400d2cc3:0x3ffcf9e0 0x400d4fc5:0x3ffcfa20 0x400d2560:0x3ffcfa60 0x4010d305:0x3ffcfa80
+  #0  0x40091189 in memcpy at /builds/idf/crosstool-NG/.build/HOST-x86_64-w64-mingw32/xtensa-esp32-elf/src/newlib/newlib/libc/machine/xtensa/memcpy.S:154
+  #1  0x400f78a1 in NimBLERemoteService::getUUID() at .pio/libdeps/esp32dev/NimBLE-Arduino/src/NimBLERemoteService.cpp:303
+  #2  0x400f6154 in NimBLEClient::getService(NimBLEUUID const&) at .pio/libdeps/esp32dev/NimBLE-Arduino/src/NimBLEClient.cpp:640 (discriminator 2)
+  #3  0x400d2cc3 in SparkBTControl::subscribeToNotifications(std::function<void (NimBLERemoteCharacteristic*, unsigned char*, unsigned int, bool)>) at src/SparkBTControl.cpp:186
+  #4  0x400d4fc5 in SparkDataControl::checkBLEConnection() at src/SparkDataControl.cpp:1156
+  #5  0x400d2560 in loop() at C:/Users/JellevanLeeuwen/git/Ignitron/Ignitron.ino:84
+  #6  0x4010d305 in loopTask(void*) at C:/Users/JellevanLeeuwen/.platformio/packages/framework-arduinoespressif32/cores/esp32/main.cpp:50
+
+
+
+
+
+ELF file SHA256: e5949f6f4abdf786
+
+Rebooting...
+ets Jul 29 2019 12:21:46
+
+rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+configsip: 0, SPIWP:0xee
 clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
 mode:DIO, clock div:2
 load:0x3fff0030,len:1184
@@ -26,6 +84,39 @@ Notifications turned on
 Done with this device.
 BLE connection to Spark established.
 [ble] ign->amp len=23 dir=to-spark hdr=53FE
+[bridge] ignoring amp response msg=02 type=7 pending=no pendingMsg=00
+[ble] ign->amp len=23 dir=to-spark hdr=53FE
+Message processed:
+{"Serial Number": "S040C6118625"}
+[bridge] ignoring amp response msg=03 type=6 pending=no pendingMsg=00
+[ble] ign->amp len=29 dir=to-spark hdr=53FE
+Message processed:
+{"Amp Name": "Spark 40"}
+[bridge] ignoring amp response msg=04 type=16 pending=no pendingMsg=00
+HW checksum for preset 2 changed (Cache: ca / Amp: 4b), invalidating cache.
+Getting current preset from Spark
+Changing to HW preset 2...[ble] ign->amp len=26 dir=to-spark hdr=53FE
+[ble] ign->amp len=26 dir=to-spark hdr=53FE
+Message processed:
+{"Checksum Preset 1": "C5", "Checksum Preset 2": "4B", "Checksum Preset 3": "C4", "Checksum Preset 4": "58"}
+[bridge] ignoring amp response msg=06 type=0 pending=no pendingMsg=00
+Getting current preset from Spark
+[ble] ign->amp len=26 dir=to-spark hdr=53FE
+OK
+[bridge] ignoring amp response msg=07 type=1 pending=no pendingMsg=00
+Message processed:
+{"PresetNumber": 0, "UUID": "21F51633-F755-40C9-987E-C821EFD2976B", 
+"Name": "vox ac30 - worship", "Version": "0.7", "Description": "1-Clean", "Icon": "icon.png", "BPM": 120.0000, 
+"Pedals": [
+{"Name": "bias.noisegate", "IsOn": true, "Parameters":[0.3516, 0.4955, 1.0000]}, 
+{"Name": "Compressor", "IsOn": true, "Parameters":[0.5939, 0.3012]}, 
+{"Name": "DistortionTS9", "IsOn": true, "Parameters":[0.2468, 0.6026, 0.7001, 0.0000]}, 
+{"Name": "AC Boost", "IsOn": true, "Parameters":[0.3512, 0.5968, 0.5041, 0.4517, 0.6525]}, 
+{"Name": "ChorusAnalog", "IsOn": true, "Parameters":[0.4488, 0.2521, 0.3991, 0.3513]}, 
+{"Name": "DelayMono", "IsOn": true, "Parameters":[0.3307, 0.3339, 0.4615, 0.6000, 1.0000]}, 
+{"Name": "bias.reverb", "IsOn": true, "Parameters":[0.5989, 0.4033, 0.7470, 0.7983, 0.2961, 0.6995, 0.5000, 1.0000]}],
+"Checksum": "FE"
+}
 Spark app connected to Ignitron BLE server
 Amp connected: yes, scanning: no
 Address: 0c:15:63:29:2c:ac Subscribed to notifications for 0xffc2
@@ -43,10 +134,7 @@ Message processed:
 [ble] ign->amp len=29 dir=to-spark hdr=53FE
 [bridge] forwarding amp response to app msg=03 chunks=1 type=16
 [ble] ign->app len=15 dir=unknown hdr=032A
-HW checksum for preset 1 changed (Cache: 00 / Amp: c5), invalidating cache.
 HW checksum for preset 2 changed (Cache: 00 / Amp: 4b), invalidating cache.
-HW checksum for preset 3 changed (Cache: 00 / Amp: c4), invalidating cache.
-HW checksum for preset 4 changed (Cache: 00 / Amp: 58), invalidating cache.
 Message processed:
 {"Checksum Preset 1": "C5", "Checksum Preset 2": "4B", "Checksum Preset 3": "C4", "Checksum Preset 4": "58"}
 [ble] app->ign len=60 dir=to-spark hdr=53FE
@@ -147,106 +235,11 @@ Preset number changed, preset not cached, getting current preset from Spark
 Getting current preset from Spark
 [ble] ign->amp len=26 dir=to-spark hdr=53FE
 Message processed:
-{"New HW Preset number": 1}
+{"New HW Preset number": 2}
 Getting current preset from Spark
 [ble] ign->amp len=26 dir=to-spark hdr=53FE
 [ble] app->ign len=60 dir=to-spark hdr=53FE
 [ble] ign->amp len=60 dir=to-spark hdr=53FE
-[bridge] forwarding amp response to app msg=08 chunks=32 type=1
-[ble] ign->app len=117 dir=unknown hdr=0301
-[ble] ign->app len=39 dir=unknown hdr=0301
-[ble] ign->app len=39 dir=unknown hdr=0301
-[ble] ign->app len=39 dir=unknown hdr=0301
-[ble] ign->app len=39 dir=unknown hdr=0301
-[ble] ign->app len=39 dir=unknown hdr=0301
-[ble] ign->app len=39 dir=unknown hdr=0301
-[ble] ign->app len=39 dir=unknown hdr=0301
-[ble] ign->app len=39 dir=unknown hdr=0301
-[ble] ign->app len=39 dir=unknown hdr=0301
-[ble] ign->app len=39 dir=unknown hdr=0301
-[ble] ign->app len=39 dir=unknown hdr=0301
-[ble] ign->app len=39 dir=unknown hdr=0301
-[ble] ign->app len=39 dir=unknown hdr=0301
-[ble] ign->app len=12 dir=unknown hdr=0301
-[ble] ign->app len=39 dir=unknown hdr=0301
-[ble] ign->app len=39 dir=unknown hdr=0301
-[ble] ign->app len=39 dir=unknown hdr=0301
-[ble] ign->app len=39 dir=unknown hdr=0301
-[ble] ign->app len=39 dir=unknown hdr=0301
-[ble] ign->app len=39 dir=unknown hdr=0301
-[ble] ign->app len=39 dir=unknown hdr=0301
-[ble] ign->app len=39 dir=unknown hdr=0301
-[ble] ign->app len=39 dir=unknown hdr=0301
-[ble] ign->app len=39 dir=unknown hdr=0301
-[ble] ign->app len=39 dir=unknown hdr=0301
-[ble] ign->app len=39 dir=unknown hdr=0301
-[ble] ign->app len=39 dir=unknown hdr=0301
-[ble] ign->app len=39 dir=unknown hdr=0301
-[ble] ign->app len=39 dir=unknown hdr=0301
-[ble] ign->app len=39 dir=unknown hdr=0301
-[ble] ign->app len=90 dir=unknown hdr=0301
-Message processed:
-{"PresetNumber": 0, "UUID": "46D79E22-9978-47F8-8E29-25619BCBE6BC", 
-"Name": "vox ac30 - Clean", "Version": "0.7", "Description": "1-Clean", "Icon": "icon.png", "BPM": 120.0000, 
-"Pedals": [
-{"Name": "bias.noisegate", "IsOn": false, "Parameters":[0.0993, 0.5710, 0.0000]}, 
-{"Name": "BlueComp", "IsOn": false, "Parameters":[0.4305, 0.6633, 0.3550, 0.5570]}, 
-{"Name": "DistortionTS9", "IsOn": false, "Parameters":[0.0580, 0.7417, 0.5959, 0.0000]}, 
-{"Name": "AC Boost", "IsOn": true, "Parameters":[0.4917, 0.4693, 0.5041, 0.5938, 0.1938]}, 
-{"Name": "Flanger", "IsOn": false, "Parameters":[0.4138, 0.6630, 0.6552]}, 
-{"Name": "DelayRe201", "IsOn": true, "Parameters":[0.0978, 0.3122, 0.4852, 0.3696, 1.0000]}, 
-{"Name": "bias.reverb", "IsOn": false, "Parameters":[0.5612, 0.5067, 0.4179, 0.3008, 0.6023, 0.5941, 0.0000, 0.0000]}],
-"Checksum": "C5"
-}
-[bridge] forwarding amp response to app msg=08 chunks=13 type=1
-[ble] ign->app len=117 dir=unknown hdr=0301
-[ble] ign->app len=39 dir=unknown hdr=0301
-[ble] ign->app len=39 dir=unknown hdr=0301
-[ble] ign->app len=39 dir=unknown hdr=0301
-[ble] ign->app len=39 dir=unknown hdr=0301
-[ble] ign->app len=39 dir=unknown hdr=0301
-[ble] ign->app len=39 dir=unknown hdr=0301
-[ble] ign->app len=39 dir=unknown hdr=0301
-[ble] ign->app len=39 dir=unknown hdr=0301
-[ble] ign->app len=39 dir=unknown hdr=0301
-[ble] ign->app len=39 dir=unknown hdr=0301
-[ble] ign->app len=39 dir=unknown hdr=0301
-[ble] app->ign len=23 dir=to-spark hdr=53FE
-[ble] ign->app len=12 dir=unknown hdr=0301
-Message processed:
-{"PresetNumber": 32, "UUID": "", 
-"Name": "", "Version": "0.7", "Description": "1-Clean", "Icon": "icon.png", "BPM": 120.0000, 
-"Pedals": [
-{"Name": "bias.noisegate", "IsOn": false, "Parameters":[0.0993, 0.5710, 0.0000]}, 
-{"Name": "BlueComp", "IsOn": false, "Parameters":[0.4305, 0.6633, 0.3550, 0.5570]}, 
-{"Name": "DistortionTS9", "IsOn": false, "Parameters":[0.0580, 0.7417, 0.5959, 0.0000]}, 
-{"Name": "AC Boost", "IsOn": true, "Parameters":[0.4917, 0.4693, 0.5041, 0.5938, 0.1938]}, 
-{"Name": "Flanger", "IsOn": false, "Parameters":[0.4138, 0.6630, 0.6552]}, 
-{"Name": "DelayRe201", "IsOn": true, "Parameters":[0.0978, 0.3122, 0.4852, 0.3696, 1.0000]}, 
-{"Name": "bias.reverb", "IsOn": false, "Parameters":[0.5612, 0.5067, 0.4179, 0.3008, 0.6023, 0.5941, 0.0000, 0.0000]}],
-"Checksum": "C5"
-}
-[ble] ign->amp len=23 dir=to-spark hdr=53FE
-[ble] app->ign len=23 dir=to-spark hdr=53FE
-[ble] ign->amp len=23 dir=to-spark hdr=53FE
-[bridge] forwarding amp response to app msg=0A chunks=1 type=15
-[ble] ign->app len=9 dir=unknown hdr=0365
-Tuner off received.
-[ble] app->ign len=26 dir=to-spark hdr=53FE
-[ble] ign->amp len=23 dir=to-spark hdr=53FE
-[ble] ign->amp len=26 dir=to-spark hdr=53FE
-Preset number changed, preset not cached, getting current preset from Spark
-Getting current preset from Spark
-[ble] ign->amp len=26 dir=to-spark hdr=53FE
-Message processed:
-{"New HW Preset number": 2}
-Getting current preset from Spark
-[ble] ign->amp len=26 dir=to-spark hdr=53FE
-[bridge] forwarding amp response to app msg=0B chunks=1 type=0
-[ble] ign->app len=7 dir=unknown hdr=0438
-Getting current preset from Spark
-[ble] ign->amp len=26 dir=to-spark hdr=53FE
-OK
 [bridge] forwarding amp response to app msg=08 chunks=49 type=1
 [ble] ign->app len=117 dir=unknown hdr=0301
 [ble] ign->app len=39 dir=unknown hdr=0301
@@ -310,101 +303,395 @@ Message processed:
 {"Name": "bias.reverb", "IsOn": true, "Parameters":[0.5989, 0.4033, 0.7470, 0.7983, 0.2961, 0.6995, 0.5000, 1.0000]}],
 "Checksum": "FE"
 }
-[ble] app->ign len=26 dir=to-spark hdr=53FE
+[ble] app->ign len=23 dir=to-spark hdr=53FE
+[ble] app->ign len=25 dir=to-spark hdr=53FE
 [ble] ign->amp len=23 dir=to-spark hdr=53FE
-[ble] ign->amp len=26 dir=to-spark hdr=53FE
-Preset number changed, preset not cached, getting current preset from Spark
-Getting current preset from Spark
-[ble] ign->amp len=26 dir=to-spark hdr=53FE
-Message processed:
-{"New HW Preset number": 1}
-Getting current preset from Spark
-[ble] ign->amp len=26 dir=to-spark hdr=53FE
-[bridge] forwarding amp response to app msg=0C chunks=1 type=0
-[ble] ign->app len=7 dir=unknown hdr=0438
-Getting current preset from Spark
-[ble] ign->amp len=26 dir=to-spark hdr=53FE
-OK
-[bridge] forwarding amp response to app msg=0C chunks=32 type=1
-[ble] ign->app len=117 dir=unknown hdr=0301
-[ble] ign->app len=39 dir=unknown hdr=0301
-[ble] ign->app len=39 dir=unknown hdr=0301
-[ble] ign->app len=39 dir=unknown hdr=0301
-[ble] ign->app len=39 dir=unknown hdr=0301
-[ble] ign->app len=39 dir=unknown hdr=0301
-[ble] ign->app len=39 dir=unknown hdr=0301
-[ble] ign->app len=39 dir=unknown hdr=0301
-[ble] ign->app len=39 dir=unknown hdr=0301
-[ble] ign->app len=39 dir=unknown hdr=0301
-[ble] ign->app len=39 dir=unknown hdr=0301
-[ble] ign->app len=39 dir=unknown hdr=0301
-[ble] ign->app len=39 dir=unknown hdr=0301
-[ble] ign->app len=39 dir=unknown hdr=0301
-[ble] ign->app len=12 dir=unknown hdr=0301
-[ble] ign->app len=39 dir=unknown hdr=0301
-[ble] ign->app len=39 dir=unknown hdr=0301
-[ble] ign->app len=39 dir=unknown hdr=0301
-[ble] ign->app len=39 dir=unknown hdr=0301
-[ble] ign->app len=39 dir=unknown hdr=0301
-[ble] ign->app len=39 dir=unknown hdr=0301
-[ble] ign->app len=39 dir=unknown hdr=0301
-[ble] ign->app len=39 dir=unknown hdr=0301
-[ble] ign->app len=39 dir=unknown hdr=0301
-[ble] ign->app len=39 dir=unknown hdr=0301
-[ble] ign->app len=39 dir=unknown hdr=0301
-[ble] ign->app len=39 dir=unknown hdr=0301
-[ble] ign->app len=39 dir=unknown hdr=0301
-[ble] ign->app len=39 dir=unknown hdr=0301
-[ble] ign->app len=39 dir=unknown hdr=0301
-[ble] ign->app len=39 dir=unknown hdr=0301
-[ble] ign->app len=90 dir=unknown hdr=0301
-Message processed:
-{"PresetNumber": 0, "UUID": "46D79E22-9978-47F8-8E29-25619BCBE6BC", 
-"Name": "vox ac30 - Clean", "Version": "0.7", "Description": "1-Clean", "Icon": "icon.png", "BPM": 120.0000, 
-"Pedals": [
-{"Name": "bias.noisegate", "IsOn": false, "Parameters":[0.0993, 0.5710, 0.0000]}, 
-{"Name": "BlueComp", "IsOn": false, "Parameters":[0.4305, 0.6633, 0.3550, 0.5570]}, 
-{"Name": "DistortionTS9", "IsOn": false, "Parameters":[0.0580, 0.7417, 0.5959, 0.0000]}, 
-{"Name": "AC Boost", "IsOn": true, "Parameters":[0.4917, 0.4693, 0.5041, 0.5938, 0.1938]}, 
-{"Name": "Flanger", "IsOn": false, "Parameters":[0.4138, 0.6630, 0.6552]}, 
-{"Name": "DelayRe201", "IsOn": true, "Parameters":[0.0978, 0.3122, 0.4852, 0.3696, 1.0000]}, 
-{"Name": "bias.reverb", "IsOn": false, "Parameters":[0.5612, 0.5067, 0.4179, 0.3008, 0.6023, 0.5941, 0.0000, 0.0000]}],
-"Checksum": "C5"
-}
-[bridge] forwarding amp response to app msg=0C chunks=13 type=1
-[ble] ign->app len=117 dir=unknown hdr=0301
-[ble] ign->app len=39 dir=unknown hdr=0301
-[ble] ign->app len=39 dir=unknown hdr=0301
-[ble] ign->app len=39 dir=unknown hdr=0301
-[ble] ign->app len=39 dir=unknown hdr=0301
-[ble] ign->app len=39 dir=unknown hdr=0301
-[ble] ign->app len=39 dir=unknown hdr=0301
-[ble] ign->app len=39 dir=unknown hdr=0301
-[ble] ign->app len=39 dir=unknown hdr=0301
-[ble] ign->app len=39 dir=unknown hdr=0301
-[ble] ign->app len=39 dir=unknown hdr=0301
-[ble] ign->app len=39 dir=unknown hdr=0301
-[ble] ign->app len=12 dir=unknown hdr=0301
-Message processed:
-{"PresetNumber": 32, "UUID": "", 
-"Name": "", "Version": "0.7", "Description": "1-Clean", "Icon": "icon.png", "BPM": 120.0000, 
-"Pedals": [
-{"Name": "bias.noisegate", "IsOn": false, "Parameters":[0.0993, 0.5710, 0.0000]}, 
-{"Name": "BlueComp", "IsOn": false, "Parameters":[0.4305, 0.6633, 0.3550, 0.5570]}, 
-{"Name": "DistortionTS9", "IsOn": false, "Parameters":[0.0580, 0.7417, 0.5959, 0.0000]}, 
-{"Name": "AC Boost", "IsOn": true, "Parameters":[0.4917, 0.4693, 0.5041, 0.5938, 0.1938]}, 
-{"Name": "Flanger", "IsOn": false, "Parameters":[0.4138, 0.6630, 0.6552]}, 
-{"Name": "DelayRe201", "IsOn": true, "Parameters":[0.0978, 0.3122, 0.4852, 0.3696, 1.0000]}, 
-{"Name": "bias.reverb", "IsOn": false, "Parameters":[0.5612, 0.5067, 0.4179, 0.3008, 0.6023, 0.5941, 0.0000, 0.0000]}],
-"Checksum": "C5"
-}
+[ble] ign->amp len=25 dir=to-spark hdr=53FE
+[ble] app->ign len=25 dir=to-spark hdr=53FE
+[ble] ign->amp len=25 dir=to-spark hdr=53FE
+[ble] app->ign len=25 dir=to-spark hdr=53FE
+[ble] ign->amp len=25 dir=to-spark hdr=53FE
+[ble] app->ign len=25 dir=to-spark hdr=53FE
+[ble] ign->amp len=25 dir=to-spark hdr=53FE
+[ble] app->ign len=25 dir=to-spark hdr=53FE
+[ble] ign->amp len=25 dir=to-spark hdr=53FE
+[ble] app->ign len=25 dir=to-spark hdr=53FE
+[ble] ign->amp len=25 dir=to-spark hdr=53FE
+[ble] app->ign len=25 dir=to-spark hdr=53FE
+[ble] ign->amp len=25 dir=to-spark hdr=53FE
+[ble] app->ign len=25 dir=to-spark hdr=53FE
+[ble] ign->amp len=25 dir=to-spark hdr=53FE
+[ble] app->ign len=23 dir=to-spark hdr=53FE
+[ble] ign->amp len=23 dir=to-spark hdr=53FE
 [ble] app->ign len=23 dir=to-spark hdr=53FE
 [ble] ign->amp len=23 dir=to-spark hdr=53FE
 [ble] app->ign len=25 dir=to-spark hdr=53FE
 [ble] ign->amp len=23 dir=to-spark hdr=53FE
 [ble] ign->amp len=25 dir=to-spark hdr=53FE
-[bridge] forwarding amp response to app msg=0E chunks=1 type=0
+[bridge] forwarding amp response to app msg=62 chunks=1 type=2
+[ble] ign->app len=10 dir=unknown hdr=0338
+Message processed:
+{"New HW Preset number": 1}
+[ble] app->ign len=23 dir=to-spark hdr=53FE
+[ble] ign->amp len=23 dir=to-spark hdr=53FE
+[bridge] forwarding amp response to app msg=15 chunks=1 type=15
+[ble] ign->app len=9 dir=unknown hdr=0365
+Tuner off received.
+[ble] app->ign len=26 dir=to-spark hdr=53FE
+[ble] ign->amp len=23 dir=to-spark hdr=53FE
+[ble] ign->amp len=26 dir=to-spark hdr=53FE
+Message processed:
+{"New HW Preset number": 1}
+[bridge] forwarding amp response to app msg=16 chunks=1 type=0
+[ble] ign->app len=7 dir=unknown hdr=0438
+OK
+[ble] app->ign len=26 dir=to-spark hdr=53FE
+[ble] ign->amp len=23 dir=to-spark hdr=53FE
+[ble] ign->amp len=26 dir=to-spark hdr=53FE
+Message processed:
+{"New HW Preset number": 1}
+[bridge] forwarding amp response to app msg=17 chunks=1 type=0
+[ble] ign->app len=7 dir=unknown hdr=0438
+OK
+[ble] app->ign len=26 dir=to-spark hdr=53FE
+[ble] ign->amp len=23 dir=to-spark hdr=53FE
+[ble] ign->amp len=26 dir=to-spark hdr=53FE
+Message processed:
+{"New HW Preset number": 1}
+[bridge] forwarding amp response to app msg=18 chunks=1 type=0
+[ble] ign->app len=7 dir=unknown hdr=0438
+OK
+[ble] app->ign len=26 dir=to-spark hdr=53FE
+[ble] ign->amp len=23 dir=to-spark hdr=53FE
+[ble] ign->amp len=26 dir=to-spark hdr=53FE
+Message processed:
+{"New HW Preset number": 1}
+[bridge] forwarding amp response to app msg=19 chunks=1 type=0
+[ble] ign->app len=7 dir=unknown hdr=0438
+OK
+[ble] app->ign len=26 dir=to-spark hdr=53FE
+[ble] ign->amp len=23 dir=to-spark hdr=53FE
+[ble] ign->amp len=26 dir=to-spark hdr=53FE
+Message processed:
+{"New HW Preset number": 1}
+[bridge] forwarding amp response to app msg=1A chunks=1 type=0
+[ble] ign->app len=7 dir=unknown hdr=0438
+[ble] app->ign len=26 dir=to-spark hdr=53FE
+OK
+[ble] ign->amp len=23 dir=to-spark hdr=53FE
+[ble] ign->amp len=26 dir=to-spark hdr=53FE
+Message processed:
+{"New HW Preset number": 1}
+[bridge] forwarding amp response to app msg=1B chunks=1 type=0
+[ble] ign->app len=7 dir=unknown hdr=0438
+OK
+[ble] app->ign len=26 dir=to-spark hdr=53FE
+[ble] ign->amp len=23 dir=to-spark hdr=53FE
+[ble] ign->amp len=26 dir=to-spark hdr=53FE
+Message processed:
+{"New HW Preset number": 1}
+[bridge] forwarding amp response to app msg=1C chunks=1 type=0
+[ble] ign->app len=7 dir=unknown hdr=0438
+OK
+[ble] app->ign len=26 dir=to-spark hdr=53FE
+[ble] ign->amp len=23 dir=to-spark hdr=53FE
+[ble] ign->amp len=26 dir=to-spark hdr=53FE
+Message processed:
+{"New HW Preset number": 3}
+[bridge] forwarding amp response to app msg=1D chunks=1 type=0
+[ble] ign->app len=7 dir=unknown hdr=0438
+OK
+[ble] app->ign len=26 dir=to-spark hdr=53FE
+[ble] ign->amp len=23 dir=to-spark hdr=53FE
+[ble] ign->amp len=26 dir=to-spark hdr=53FE
+Message processed:
+{"New HW Preset number": 3}
+[bridge] forwarding amp response to app msg=1E chunks=1 type=0
+[ble] ign->app len=7 dir=unknown hdr=0438
+OK
+[ble] app->ign len=26 dir=to-spark hdr=53FE
+[ble] ign->amp len=23 dir=to-spark hdr=53FE
+[ble] ign->amp len=26 dir=to-spark hdr=53FE
+Message processed:
+{"New HW Preset number": 3}
+[bridge] forwarding amp response to app msg=1F chunks=1 type=0
+[ble] ign->app len=7 dir=unknown hdr=0438
+OK
+[ble] app->ign len=26 dir=to-spark hdr=53FE
+[ble] ign->amp len=23 dir=to-spark hdr=53FE
+[ble] ign->amp len=26 dir=to-spark hdr=53FE
+Message processed:
+{"New HW Preset number": 1}
+[bridge] forwarding amp response to app msg=20 chunks=1 type=0
+[ble] ign->app len=7 dir=unknown hdr=0438
+OK
+[ble] app->ign len=26 dir=to-spark hdr=53FE
+[ble] ign->amp len=23 dir=to-spark hdr=53FE
+[ble] ign->amp len=26 dir=to-spark hdr=53FE
+Message processed:
+{"New HW Preset number": 1}
+[bridge] forwarding amp response to app msg=21 chunks=1 type=0
+[ble] ign->app len=7 dir=unknown hdr=0438
+OK
+[ble] app->ign len=26 dir=to-spark hdr=53FE
+[ble] ign->amp len=23 dir=to-spark hdr=53FE
+[ble] ign->amp len=26 dir=to-spark hdr=53FE
+Message processed:
+{"New HW Preset number": 1}
+[bridge] forwarding amp response to app msg=22 chunks=1 type=0
+[ble] ign->app len=7 dir=unknown hdr=0438
+OK
+[ble] app->ign len=26 dir=to-spark hdr=53FE
+[ble] ign->amp len=23 dir=to-spark hdr=53FE
+[ble] ign->amp len=26 dir=to-spark hdr=53FE
+Message processed:
+{"New HW Preset number": 1}
+[bridge] forwarding amp response to app msg=23 chunks=1 type=0
+[ble] ign->app len=7 dir=unknown hdr=0438
+[ble] app->ign len=26 dir=to-spark hdr=53FE
+OK
+[ble] ign->amp len=23 dir=to-spark hdr=53FE
+[ble] ign->amp len=26 dir=to-spark hdr=53FE
+Message processed:
+{"New HW Preset number": 1}
+[bridge] forwarding amp response to app msg=24 chunks=1 type=0
+[ble] ign->app len=7 dir=unknown hdr=0438
+OK
+[ble] app->ign len=23 dir=to-spark hdr=53FE
+[ble] ign->amp len=23 dir=to-spark hdr=53FE
+[ble] app->ign len=23 dir=to-spark hdr=53FE
+[ble] ign->amp len=23 dir=to-spark hdr=53FE
+[ble] app->ign len=25 dir=to-spark hdr=53FE
+[ble] ign->amp len=23 dir=to-spark hdr=53FE
+[ble] ign->amp len=25 dir=to-spark hdr=53FE
+[bridge] forwarding amp response to app msg=27 chunks=1 type=0
 [ble] ign->app len=7 dir=unknown hdr=0465
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
+[ble] ign->app len=14 dir=unknown hdr=0364
 [ble] ign->app len=14 dir=unknown hdr=0364
 [ble] ign->app len=14 dir=unknown hdr=0364
 [ble] ign->app len=14 dir=unknown hdr=0364
@@ -757,20 +1044,5 @@ Message processed:
 [ble] ign->amp len=25 dir=to-spark hdr=53FE
 [ble] ign->app len=14 dir=unknown hdr=0364
 [ble] ign->app len=14 dir=unknown hdr=0364
-[bridge] forwarding amp response to app msg=0F chunks=1 type=0
+[bridge] forwarding amp response to app msg=28 chunks=1 type=0
 [ble] ign->app len=7 dir=unknown hdr=0465
-[ble] app->ign len=26 dir=to-spark hdr=53FE
-[ble] ign->amp len=23 dir=to-spark hdr=53FE
-[ble] ign->amp len=26 dir=to-spark hdr=53FE
-Preset number changed, preset not cached, getting current preset from Spark
-Getting current preset from Spark
-[ble] ign->amp len=26 dir=to-spark hdr=53FE
-Message processed:
-{"New HW Preset number": 2}
-[bridge] forwarding amp response to app msg=10 chunks=1 type=0
-[ble] ign->app len=7 dir=unknown hdr=0438
-Getting current preset from Spark
-[ble] ign->amp len=26 dir=to-spark hdr=53FE
-OK
-Getting current preset from Spark
-[ble] ign->amp len=26 dir=to-spark hdr=53FE
