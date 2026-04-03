@@ -1,5 +1,13 @@
 # Release Notes
 
+## 1.9.1.29 - 2026-04-03
+- Replaced the APP-mode tuner auto-entry timing heuristic with an explicit arm/disarm state: tuner output can open Ignitron tuner only after a fresh app tuner request, and explicit tuner-off now disarms further re-entry until the next tuner request.
+- Removed the incorrect preset-response-based tuner exit fallback.
+
+## 1.9.1.28 - 2026-04-03
+- Fixed APP-mode tuner UI getting stuck after leaving tuner in Spark app by exiting tuner mode when normal preset/hardware-preset responses resume.
+- Restored Ignitron tuner auto-entry on tuner output frames while preserving the short post-exit cooldown that blocks immediate bounce-back from trailing tuner packets.
+
 ## 1.9.1.27 - 2026-04-03
 - Fixed APP-mode crash under high tuner traffic by adding bounded queue backpressure for BLE notification buffering and dropping oldest queued blocks when overloaded.
 - Improved APP-mode responsiveness by processing multiple queued Spark blocks per update cycle instead of only one.

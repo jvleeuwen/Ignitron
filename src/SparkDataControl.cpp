@@ -116,6 +116,7 @@ BatteryLevel SparkDataControl::batteryLevel_ = BATTERY_LEVEL_0;
 
 bool SparkDataControl::isInitBoot_ = true;
 bool SparkDataControl::displayDirty_ = true;
+bool SparkDataControl::tunerAutoEnterArmed_ = false;
 unsigned long SparkDataControl::lastTunerRequestMs_ = 0;
 const unsigned long SparkDataControl::tunerRequestAutoEnterWindowMs_ = 3000;
 unsigned long SparkDataControl::lastTunerOffMs_ = 0;
@@ -563,7 +564,8 @@ void SparkDataControl::processSparkData(ByteVector &blk) {
         }
         if (requestType == MSG_REQ_INVALID) {
             // Spark app tuner toggle requests currently arrive as unmapped request type.
-            // Arm a short window so incoming tuner output can activate tuner mode.
+            // Arm tuner auto-enter so subsequent tuner output can activate tuner mode.
+            tunerAutoEnterArmed_ = true;
             lastTunerRequestMs_ = millis();
         }
         if (requestType == MSG_REQ_72) {
@@ -1016,16 +1018,16 @@ void SparkDataControl::handleAppModeResponse() {
 
         if (lastMessageType == MSG_TYPE_TUNER_OUTPUT) {
             // Some amp/app combinations do not emit an explicit tuner-on event.
-            // Enter tuner mode from tuner output only shortly after an app tuner request
+            // Enter tuner mode from tuner output only while tuner auto-enter is armed
             // and unless we just processed tuner-off.
             unsigned long nowMs = millis();
-            bool hasRecentTunerRequest = (lastTunerRequestMs_ > 0) && ((nowMs - lastTunerRequestMs_) < tunerRequestAutoEnterWindowMs_);
             bool recentlyTurnedOff = (lastTunerOffMs_ > 0) && ((nowMs - lastTunerOffMs_) < tunerOutputReopenBlockMs_);
-            if (subMode_ != SUB_MODE_TUNER && hasRecentTunerRequest && !recentlyTurnedOff) {
+            bool hasRecentTunerRequest = (lastTunerRequestMs_ > 0) && ((nowMs - lastTunerRequestMs_) < tunerRequestAutoEnterWindowMs_);
+            if (subMode_ != SUB_MODE_TUNER && tunerAutoEnterArmed_ && hasRecentTunerRequest && !recentlyTurnedOff) {
                 Serial.println("Tuner output received, entering tuner mode.");
                 subMode_ = SUB_MODE_TUNER;
                 SparkPresetControl::getInstance().updatePendingWithActive();
-                lastTunerRequestMs_ = 0;
+                displayDirty_ = true;
             }
             if (subMode_ == SUB_MODE_TUNER) {
                 displayDirty_ = true;
@@ -1034,6 +1036,7 @@ void SparkDataControl::handleAppModeResponse() {
 
         if (lastMessageType == MSG_TYPE_TUNER_ON) {
             Serial.println("Tuner on received.");
+            tunerAutoEnterArmed_ = true;
             lastTunerRequestMs_ = 0;
             lastTunerOffMs_ = 0;
             subMode_ = SUB_MODE_TUNER;
@@ -1043,6 +1046,7 @@ void SparkDataControl::handleAppModeResponse() {
 
         if (lastMessageType == MSG_TYPE_TUNER_OFF) {
             Serial.println("Tuner off received.");
+            tunerAutoEnterArmed_ = false;
             lastTunerRequestMs_ = 0;
             lastTunerOffMs_ = millis();
             subMode_ = SUB_MODE_PRESET;

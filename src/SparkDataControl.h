@@ -224,6 +224,7 @@ private:
     // keep track which HW presets have been read so far
     static bool isInitBoot_;
     static bool displayDirty_;
+    static bool tunerAutoEnterArmed_;
     static unsigned long lastTunerRequestMs_;
     static const unsigned long tunerRequestAutoEnterWindowMs_;
     static unsigned long lastTunerOffMs_;
