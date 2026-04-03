@@ -8,6 +8,10 @@
 #include "SparkDataControl.h"
 
 namespace {
+constexpr size_t kMaxBridgeQueueDepth = 220;
+constexpr size_t kMaxMsgsPerUpdate = 8;
+constexpr bool kVerboseBridgeLogs = false;
+
 const char *bridgeBool(bool value) {
     return value ? "yes" : "no";
 }
@@ -112,6 +116,8 @@ BatteryLevel SparkDataControl::batteryLevel_ = BATTERY_LEVEL_0;
 
 bool SparkDataControl::isInitBoot_ = true;
 bool SparkDataControl::displayDirty_ = true;
+unsigned long SparkDataControl::lastTunerRequestMs_ = 0;
+const unsigned long SparkDataControl::tunerRequestAutoEnterWindowMs_ = 3000;
 unsigned long SparkDataControl::lastTunerOffMs_ = 0;
 const unsigned long SparkDataControl::tunerOutputReopenBlockMs_ = 1200;
 deque<byte> SparkDataControl::pendingAppRequestMsgNums_ = {};
@@ -423,9 +429,11 @@ void SparkDataControl::readPresetChecksums() {
 
 void SparkDataControl::checkForUpdates() {
 
-    if (msgQueue.size() > 0) {
+    size_t processed = 0;
+    while (msgQueue.size() > 0 && processed < kMaxMsgsPerUpdate) {
         processSparkData(msgQueue.front());
         msgQueue.pop();
+        processed++;
         // Only trigger display refresh when a visible status actually changed.
         if (statusObject.isPresetUpdated() || statusObject.isPresetNumberUpdated() ||
             statusObject.isEffectUpdated() || statusObject.isVolumeChanged() ||
@@ -512,7 +520,7 @@ void SparkDataControl::processSparkData(ByteVector &blk) {
     // Check if incoming message requires sending an acknowledgment
     handleSendingAck(blk);
 
-    if (operationMode_ == SPARK_MODE_APP) {
+    if (operationMode_ == SPARK_MODE_APP && kVerboseBridgeLogs) {
         logBridgeFrameSummary("process input", blk);
     }
 
@@ -522,13 +530,16 @@ void SparkDataControl::processSparkData(ByteVector &blk) {
     if (operationMode_ == SPARK_MODE_APP && isMessageToSpark) {
         // Bridge app-originated Spark protocol frames directly to amp so all command types
         // (requests and control writes like tuner/preset/effect updates) are forwarded.
-        logBridgeFrameSummary("passthrough app->amp", blk);
+        if (kVerboseBridgeLogs) {
+            logBridgeFrameSummary("passthrough app->amp", blk);
+        }
         ByteVector appBlock = blk;
         bleControl->writeBLE(appBlock, true, false);
     }
 
     MessageProcessStatus retCode = sparkSsr.processBlock(blk);
-    if (operationMode_ == SPARK_MODE_APP) {
+    bool isTunerOutputEvent = (retCode == MSG_PROCESS_RES_COMPLETE && statusObject.lastMessageType() == MSG_TYPE_TUNER_OUTPUT);
+    if (operationMode_ == SPARK_MODE_APP && kVerboseBridgeLogs && !isTunerOutputEvent) {
         Serial.printf("[bridge] parsed status=%s type=%d msg=%02X pending=%s pendingMsg=%02X\n",
                       bridgeProcessStatusName(retCode),
                       statusObject.lastMessageType(),
@@ -544,25 +555,38 @@ void SparkDataControl::processSparkData(ByteVector &blk) {
         MessageType requestType = statusObject.lastMessageType();
         byte requestMsgNum = statusObject.lastMessageNum();
         vector<CmdData> appRequest = buildAppModeBridgeRequest(requestType, requestMsgNum);
-        Serial.printf("[bridge] app request captured msg=%02X chunks=%u type=%d\n",
-                      requestMsgNum,
-                      static_cast<unsigned int>(appRequest.size()),
-                      requestType);
-        if (requestType == MSG_REQ_72) {
-            Serial.printf("[bridge] responding locally to app request msg=%02X type=%d\n",
+        if (kVerboseBridgeLogs) {
+            Serial.printf("[bridge] app request captured msg=%02X chunks=%u type=%d\n",
                           requestMsgNum,
+                          static_cast<unsigned int>(appRequest.size()),
                           requestType);
+        }
+        if (requestType == MSG_REQ_INVALID) {
+            // Spark app tuner toggle requests currently arrive as unmapped request type.
+            // Arm a short window so incoming tuner output can activate tuner mode.
+            lastTunerRequestMs_ = millis();
+        }
+        if (requestType == MSG_REQ_72) {
+            if (kVerboseBridgeLogs) {
+                Serial.printf("[bridge] responding locally to app request msg=%02X type=%d\n",
+                              requestMsgNum,
+                              requestType);
+            }
             bleControl->notifyClients(appRequest);
         } else if (appRequest.size() > 0) {
             pendingAppRequestMsgNums_.push_back(requestMsgNum);
         } else {
-            Serial.printf("[bridge] unable to map app request msg=%02X type=%d\n",
-                          requestMsgNum,
-                          requestType);
+            if (kVerboseBridgeLogs) {
+                Serial.printf("[bridge] unable to map app request msg=%02X type=%d\n",
+                              requestMsgNum,
+                              requestType);
+            }
         }
         for (auto &chunk : appRequest) {
             ByteVector data = chunk.data;
-            logBridgeFrameSummary("forward app->amp", data);
+            if (kVerboseBridgeLogs) {
+                logBridgeFrameSummary("forward app->amp", data);
+            }
             // Requests are already forwarded via raw passthrough above.
         }
     }
@@ -571,24 +595,30 @@ void SparkDataControl::processSparkData(ByteVector &blk) {
             vector<ByteVector> rawBlocks = sparkSsr.lastResponse();
             vector<CmdData> appResponse = rawBlocksToCmdData(rawBlocks);
             // Forward only amp responses that correspond to an actual app-originated request.
-            Serial.printf("[bridge] forwarding amp response to app msg=%02X chunks=%u type=%d\n",
-                          statusObject.lastMessageNum(),
-                          static_cast<unsigned int>(appResponse.size()),
-                          statusObject.lastMessageType());
+            if (kVerboseBridgeLogs || statusObject.lastMessageType() != MSG_TYPE_TUNER_OUTPUT) {
+                Serial.printf("[bridge] forwarding amp response to app msg=%02X chunks=%u type=%d\n",
+                              statusObject.lastMessageNum(),
+                              static_cast<unsigned int>(appResponse.size()),
+                              statusObject.lastMessageType());
+            }
             bleControl->notifyClients(appResponse);
             if (hasPendingAppRequestMsg(pendingAppRequestMsgNums_, statusObject.lastMessageNum())) {
                 clearPendingAppRequestMsg(pendingAppRequestMsgNums_, statusObject.lastMessageNum());
             }
         } else if (operationMode_ == SPARK_MODE_APP && isMessageFromSpark) {
-            Serial.printf("[bridge] ignoring amp response msg=%02X type=%d pending=%s pendingMsg=%02X\n",
-                          statusObject.lastMessageNum(),
-                          statusObject.lastMessageType(),
-                          bridgeBool(!pendingAppRequestMsgNums_.empty()),
-                          pendingAppRequestMsgNums_.empty() ? 0x00 : pendingAppRequestMsgNums_.front());
+            if (kVerboseBridgeLogs || statusObject.lastMessageType() != MSG_TYPE_TUNER_OUTPUT) {
+                Serial.printf("[bridge] ignoring amp response msg=%02X type=%d pending=%s pendingMsg=%02X\n",
+                              statusObject.lastMessageNum(),
+                              statusObject.lastMessageType(),
+                              bridgeBool(!pendingAppRequestMsgNums_.empty()),
+                              pendingAppRequestMsgNums_.empty() ? 0x00 : pendingAppRequestMsgNums_.front());
+            }
         } else if (operationMode_ == SPARK_MODE_APP && isMessageToSpark) {
-            Serial.printf("[bridge] completed app-originated message msg=%02X type=%d\n",
-                          statusObject.lastMessageNum(),
-                          statusObject.lastMessageType());
+            if (kVerboseBridgeLogs) {
+                Serial.printf("[bridge] completed app-originated message msg=%02X type=%d\n",
+                              statusObject.lastMessageNum(),
+                              statusObject.lastMessageType());
+            }
         }
         handleAppModeResponse();
     }
@@ -986,13 +1016,16 @@ void SparkDataControl::handleAppModeResponse() {
 
         if (lastMessageType == MSG_TYPE_TUNER_OUTPUT) {
             // Some amp/app combinations do not emit an explicit tuner-on event.
-            // Enter tuner mode from tuner output unless we just processed tuner-off.
+            // Enter tuner mode from tuner output only shortly after an app tuner request
+            // and unless we just processed tuner-off.
             unsigned long nowMs = millis();
+            bool hasRecentTunerRequest = (lastTunerRequestMs_ > 0) && ((nowMs - lastTunerRequestMs_) < tunerRequestAutoEnterWindowMs_);
             bool recentlyTurnedOff = (lastTunerOffMs_ > 0) && ((nowMs - lastTunerOffMs_) < tunerOutputReopenBlockMs_);
-            if (subMode_ != SUB_MODE_TUNER && !recentlyTurnedOff) {
+            if (subMode_ != SUB_MODE_TUNER && hasRecentTunerRequest && !recentlyTurnedOff) {
                 Serial.println("Tuner output received, entering tuner mode.");
                 subMode_ = SUB_MODE_TUNER;
                 SparkPresetControl::getInstance().updatePendingWithActive();
+                lastTunerRequestMs_ = 0;
             }
             if (subMode_ == SUB_MODE_TUNER) {
                 displayDirty_ = true;
@@ -1001,6 +1034,7 @@ void SparkDataControl::handleAppModeResponse() {
 
         if (lastMessageType == MSG_TYPE_TUNER_ON) {
             Serial.println("Tuner on received.");
+            lastTunerRequestMs_ = 0;
             lastTunerOffMs_ = 0;
             subMode_ = SUB_MODE_TUNER;
             SparkPresetControl::getInstance().updatePendingWithActive();
@@ -1009,6 +1043,7 @@ void SparkDataControl::handleAppModeResponse() {
 
         if (lastMessageType == MSG_TYPE_TUNER_OFF) {
             Serial.println("Tuner off received.");
+            lastTunerRequestMs_ = 0;
             lastTunerOffMs_ = millis();
             subMode_ = SUB_MODE_PRESET;
             SparkPresetControl::getInstance().updatePendingWithActive();
@@ -1167,7 +1202,7 @@ void SparkDataControl::bleNotificationCallback(
     // Triggered when data is received from Spark Amp in APP mode
     //  Transform data into ByteVetor and process
     ByteVector chunk(&pData[0], &pData[length]);
-    if (operationMode_ == SPARK_MODE_APP) {
+    if (operationMode_ == SPARK_MODE_APP && kVerboseBridgeLogs) {
         Serial.printf("[bridge] amp notify len=%u notify=%s uuid=%s\n",
                       static_cast<unsigned int>(length),
                       isNotify ? "yes" : "no",
@@ -1179,6 +1214,10 @@ void SparkDataControl::bleNotificationCallback(
     // DEBUG_PRINTLN();
     //  DEBUG_PRINTF("Is notify: %s\n", isNotify ? "true" : "false");
     //   Add incoming data to message queue for processing
+    if (msgQueue.size() >= kMaxBridgeQueueDepth) {
+        // Keep newest traffic and avoid heap growth/abort under high notification rate.
+        msgQueue.pop();
+    }
     msgQueue.push(chunk);
     // DEBUG_PRINTF("Seding back data via notify.");
     // vector<ByteVector> notifyVector = { chunk };
@@ -1187,6 +1226,9 @@ void SparkDataControl::bleNotificationCallback(
 
 void SparkDataControl::queueMessage(ByteVector &blk) {
     if (blk.size() > 0) {
+        if (msgQueue.size() >= kMaxBridgeQueueDepth) {
+            msgQueue.pop();
+        }
         msgQueue.push(blk);
     }
 }

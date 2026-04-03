@@ -1,5 +1,11 @@
 # Release Notes
 
+## 1.9.1.27 - 2026-04-03
+- Fixed APP-mode crash under high tuner traffic by adding bounded queue backpressure for BLE notification buffering and dropping oldest queued blocks when overloaded.
+- Improved APP-mode responsiveness by processing multiple queued Spark blocks per update cycle instead of only one.
+- Reduced bridge log overhead in high-rate paths (especially tuner output) to avoid BLE/CPU contention while Spark app is connected.
+- Refined tuner mode transitions: tuner output now auto-enters tuner only in a short window after a recent app tuner request, while explicit tuner-off clears that arm state.
+
 ## 1.9.1.26 - 2026-04-03
 - Fixed APP-mode tuner entry regression where Ignitron did not enter tuner mode if Spark app/amp only emitted tuner output (`03 64`) without an explicit tuner-on event (`03 65 on`).
 - Added a short cooldown after tuner-off so trailing tuner-output packets do not immediately re-open tuner mode.
