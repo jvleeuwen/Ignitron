@@ -97,9 +97,12 @@ void SparkPresetControl::checkForUpdates(int operationMode) {
 
     if (statusObject.isPresetNumberUpdated() &&
         (operationMode == SPARK_MODE_APP)) {
-        if (pendingBank_ == 0) {
+        int sparkPresetNumber = statusObject.currentPresetNumber();
+        if (pendingBank_ == 0 && sparkPresetNumber >= 1) {
             DEBUG_PRINTLN("Preset number has changed, updating active preset");
             setActiveHWPreset();
+        } else if (pendingBank_ == 0) {
+            Serial.printf("Ignoring invalid Spark preset number %d\n", sparkPresetNumber);
         }
         statusObject.resetPresetNumberUpdateFlag();
     }
@@ -241,6 +244,11 @@ void SparkPresetControl::updatePendingWithActive() {
 }
 
 void SparkPresetControl::setActiveHWPreset() {
+
+    if (pendingPresetNum_ < 1) {
+        Serial.printf("Invalid pending HW preset %d, clamping to 1\n", pendingPresetNum_);
+        pendingPresetNum_ = 1;
+    }
 
     activePreset_ = presetBuilder.getPreset(pendingBank_, pendingPresetNum_);
     activePresetNum_ = pendingPresetNum_;

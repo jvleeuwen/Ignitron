@@ -240,6 +240,10 @@ void SparkPresetBuilder::buildPresetUUIDs() {
 Preset SparkPresetBuilder::getPreset(int bank, int pre) {
     DEBUG_PRINTF("Getting preset number %d - %02d\n", bank, pre);
     Preset retPreset;
+    if (pre < 1) {
+        Serial.println("Requested preset number out of bounds.");
+        return retPreset;
+    }
     // HW preset
     if (bank == 0) {
         if (pre > hwPresets.size()) {

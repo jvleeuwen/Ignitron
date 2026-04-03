@@ -1,5 +1,9 @@
 # Release Notes
 
+## 1.9.1.35 - 2026-04-03
+- Fixed APP-mode startup crash (`std::vector::at` out-of-range) caused by invalid preset index `0` reaching hardware-preset cache lookup during preset-number update handling.
+- Added defensive preset-index validation in preset builder and ignored invalid Spark preset-number updates (< 1) before triggering hardware-preset activation logic.
+
 ## 1.9.1.34 - 2026-04-03
 - Fixed APP-mode first-connection startup race that could trigger profile/preset requests before Spark notification subscription was active, causing an initial subscribe failure/reconnect cycle.
 - Added explicit amp-notification-subscription tracking in BLE client state and gated boot-time response-chain requests (`amp name`/`checksums`/`current preset`) to run only when notifications are confirmed active.
