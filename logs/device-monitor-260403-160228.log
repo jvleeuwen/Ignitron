@@ -1,0 +1,106 @@
+gsip: 0, SPIWP:0xee
+clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+mode:DIO, clock div:2
+load:0x3fff0030,len:1184
+load:0x40078000,len:13232
+load:0x40080400,len:3028
+entry 0x400805e4
+Initializing
+Operation mode (boot): 1
+Reading opmode file.
+Spark mode config file does not exist.
+Initializing PresetBuilder
+Reading custom presets from filesystem.
+Initializing APP modeStopping advertising keyboard
+Starting scan
+Operation mode: 1
+======= Entering APP mode =======
+Initialization done.
+Found Spark, connecting.
+Scan ended.
+Failed to connect, deleted client
+Failed to connect, starting scan
+Resetting Status
+Error while opening file /HW1_.json, returning empty preset.
+Error while opening file /HW2_.json, returning empty preset.
+Error while opening file /HW3_.json, returning empty preset.
+Error while opening file /HW4_.json, returning empty preset.
+Scan initiated
+Connected to: 6c:74:74:69:6c:2f
+Guru Meditation Error: Core  1 panic'ed (LoadProhibited). Exception was unhandled.
+
+Core  1 register dump:
+PC      : 0x400f4ef3  PS      : 0x00060a30  A0      : 0x800d2d3e  A1      : 0x3ffcf780  
+A2      : 0x3ffdb7ac  A3      : 0x3ffcf7c4  A4      : 0x00000000  A5      : 0x3ffc71a8  
+A6      : 0x00000000  A7      : 0x00000001  A8      : 0x800f79e4  A9      : 0x3ffcf760  
+A10     : 0x0000ffc0  A11     : 0x00000000  A12     : 0x00000010  A13     : 0x3ffcf780  
+A14     : 0x66656c74  A15     : 0x66656c74  SAR     : 0x00000013  EXCCAUSE: 0x0000001c  
+EXCVADDR: 0x00000000  LBEG    : 0x400924e1  LEND    : 0x400924f1  LCOUNT  : 0xffffffff  
+
+
+Backtrace: 0x400f4ef0:0x3ffcf780 0x400d2d3b:0x3ffcf7c0 0x400d4cfa:0x3ffcf800 0x400d2645:0x3ffcf840 0x4010c03d:0x3ffcf860
+  #0  0x400f4ef0 in NimBLEClient::getService(NimBLEUUID const&) at .pio/libdeps/esp32dev/NimBLE-Arduino/src/NimBLEClient.cpp:639 (discriminator 1)
+  #1  0x400d2d3b in SparkBTControl::subscribeToNotifications(std::function<void (NimBLERemoteCharacteristic*, unsigned char*, unsigned int, bool)>) at src/SparkBTControl.cpp:158
+  #2  0x400d4cfa in SparkDataControl::checkBLEConnection() at src/SparkDataControl.cpp:916
+  #3  0x400d2645 in loop() at C:/Users/JellevanLeeuwen/git/Ignitron/Ignitron.ino:84
+  #4  0x4010c03d in loopTask(void*) at C:/Users/JellevanLeeuwen/.platformio/packages/framework-arduinoespressif32/cores/esp32/main.cpp:50
+
+
+
+
+
+ELF file SHA256: 7147f6217fb2431d
+
+Rebooting...
+ets Jul 29 2019 12:21:46
+
+rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+configsip: 0, SPIWP:0xee
+clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+mode:DIO, clock div:2
+load:0x3fff0030,len:1184
+load:0x40078000,len:13232
+load:0x40080400,len:3028
+entry 0x400805e4
+Initializing
+Operation mode (boot): 1
+Reading opmode file.
+Spark mode config file does not exist.
+Initializing PresetBuilder
+Reading custom presets from filesystem.
+Initializing APP modeStopping advertising keyboard
+Starting scan
+Operation mode: 1
+======= Entering APP mode =======
+Initialization done.
+Found Spark, connecting.
+Scan ended.
+Connected to: f7:eb:ed:5b:38:23
+Subscribing to service notifications of FFC2
+Notifications turned on
+Done with this device.
+BLE connection to Spark established.
+Reading current battery level
+Message processed:
+{"Serial Number": "S040C6118625"}
+Message processed:
+{"Amp Name": "Spark 40"}
+HW checksum for preset 2 changed (Cache: ca / Amp: 4b), invalidating cache.
+Last preset file not found.
+Getting current preset from Spark
+Message processed:
+{"Checksum Preset 1": "C5", "Checksum Preset 2": "4B", "Checksum Preset 3": "C4", "Checksum Preset 4": "58"}
+Message processed:
+{"PresetNumber": 0, "UUID": "21F51633-F755-40C9-987E-C821EFD2976B", 
+"Name": "vox ac30 - worship", "Version": "0.7", "Description": "1-Clean", "Icon": "icon.png", "BPM": 120.0000, 
+"Pedals": [
+{"Name": "bias.noisegate", "IsOn": true, "Parameters":[0.3516, 0.4955, 1.0000]}, 
+{"Name": "Compressor", "IsOn": true, "Parameters":[0.5939, 0.3012]}, 
+{"Name": "DistortionTS9", "IsOn": true, "Parameters":[0.2468, 0.6026, 0.7001, 0.0000]}, 
+{"Name": "AC Boost", "IsOn": true, "Parameters":[0.3512, 0.5968, 0.5041, 0.4517, 0.6525]}, 
+{"Name": "ChorusAnalog", "IsOn": true, "Parameters":[0.4488, 0.2521, 0.3991, 0.3513]}, 
+{"Name": "DelayMono", "IsOn": true, "Parameters":[0.3307, 0.3339, 0.4615, 0.6000, 1.0000]}, 
+{"Name": "bias.reverb", "IsOn": true, "Parameters":[0.5989, 0.4033, 0.7470, 0.7983, 0.2961, 0.6995, 0.5000, 1.0000]}],
+"Checksum": "FE"
+}
+Reading current battery level
