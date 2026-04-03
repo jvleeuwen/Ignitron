@@ -84,14 +84,8 @@ OperationMode SparkDataControl::init(OperationMode opModeInput) {
 
     switch (operationMode_) {
     case SPARK_MODE_APP:
-        // Set MAC address for BLE keyboard
-        esp_base_mac_addr_set(&macKeyboard[0]);
-
-        // initialize BLE
-        bleKeyboard.setName("Ignitron BLE");
-        bleKeyboard.begin();
-        // delay(2000);
-        bleKeyboard.end();
+        // APP mode uses NimBLE client/server only (Spark Amp + Spark App bridge).
+        // Do not init BLE keyboard stack here to avoid iOS app connection conflicts.
         // In APP mode we must also advertise as a BLE server so Spark app can discover/connect.
         bleControl->startServer();
         bleControl->initBLE(&bleNotificationCallback);
@@ -367,7 +361,12 @@ void SparkDataControl::checkForUpdates() {
     if (msgQueue.size() > 0) {
         processSparkData(msgQueue.front());
         msgQueue.pop();
-        displayDirty_ = true;
+        // Only trigger display refresh when a visible status actually changed.
+        if (statusObject.isPresetUpdated() || statusObject.isPresetNumberUpdated() ||
+            statusObject.isEffectUpdated() || statusObject.isVolumeChanged() ||
+            statusObject.lastMessageType() != MSG_TYPE_NONE) {
+            displayDirty_ = true;
+        }
     }
 
     SparkPresetControl::getInstance().checkForUpdates(operationMode_);
