@@ -298,8 +298,8 @@ void SparkBTControl::startServer() {
 
     /** Optional: set the transmit power, default is 3db */
     NimBLEDevice::setPower(ESP_PWR_LVL_P9); /** +9db */
-    NimBLEDevice::setSecurityAuth(
-        /*BLE_SM_PAIR_AUTHREQ_BOND | BLE_SM_PAIR_AUTHREQ_MITM |*/ BLE_SM_PAIR_AUTHREQ_SC);
+    // Keep security requirements permissive for app compatibility.
+    // Requiring Secure Connections can prevent some Spark app/device combinations from connecting.
 
     server_ = NimBLEDevice::createServer();
     server_->setCallbacks(this);
@@ -363,6 +363,9 @@ void SparkBTControl::startServer() {
      *  to false as it will extend battery life at the expense of less data sent.
      */
     advertising_->setScanResponse(true);
+    // Improve phone compatibility when acting as BLE peripheral.
+    advertising_->setMinPreferred(0x06);
+    advertising_->setMaxPreferred(0x12);
     advertising_->start();
 
     Serial.println("Advertising Started");
