@@ -91,6 +91,8 @@ OperationMode SparkDataControl::init(OperationMode opModeInput) {
         bleKeyboard.begin();
         // delay(2000);
         bleKeyboard.end();
+        // In APP mode we must also advertise as a BLE server so Spark app can discover/connect.
+        bleControl->startServer();
         bleControl->initBLE(&bleNotificationCallback);
         DEBUG_PRINTLN("Starting regular check for empty HW presets.");
 
