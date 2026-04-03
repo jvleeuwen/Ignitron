@@ -680,6 +680,11 @@ void SparkDisplayControl::showVolumeBar() {
     SparkStatus &statusObject = SparkStatus::getInstance();
     float volume = statusObject.inputVolume();
 
+#ifdef TFT_DRIVER_ILI9341
+    // Volume overlay can appear over any previous mode; clear full UI area first.
+    display_.fillRect(0, 0, scaleX(128), scaleY(64), BLACK);
+#endif
+
     display_.setTextSize(baseTextSize1_);
     display_.setTextColor(WHITE);
     display_.setCursor(0, 0);
@@ -709,8 +714,13 @@ void SparkDisplayControl::showVolumeBar() {
 void SparkDisplayControl::checkInvertDisplay(int subMode) {
 #ifdef TFT_DRIVER_ILI9341
     // ILI9341 hardware inversion can make the TFT appear fully white in some modes.
+    // Avoid sending invert command every frame, which can cause visible flashing.
+    static bool invertConfigured = false;
     invertedDisplay = false;
-    display_.invertDisplay(false);
+    if (!invertConfigured) {
+        display_.invertDisplay(false);
+        invertConfigured = true;
+    }
     return;
 #endif
 
@@ -747,9 +757,15 @@ void SparkDisplayControl::update(bool isInitBoot) {
 #ifndef TFT_DRIVER_ILI9341
     display_.clearDisplay();
 #else
-    // TFT: clear the scaled UI region (all drawn content is scaled)
-    // This prevents flickering and artifacts on the larger screen
-    display_.fillRect(0, 0, scaleX(128), scaleY(64), BLACK);
+    // For TFT, avoid full-area clear on every frame. Clear only what this frame needs.
+    if ((opMode == SPARK_MODE_APP && isInitBoot) || opMode == SPARK_MODE_KEYBOARD ||
+        subMode == SUB_MODE_TUNER) {
+        // Full redraw modes
+        display_.fillRect(0, 0, scaleX(128), scaleY(64), BLACK);
+    } else {
+        // Regular APP/AMP mode: top band is dynamic; middle/bottom are cleared in their own draw methods.
+        display_.fillRect(0, 0, scaleX(128), scaleY(30), BLACK);
+    }
 #endif
     checkInvertDisplay(subMode);
 
