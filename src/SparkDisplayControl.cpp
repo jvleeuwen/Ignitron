@@ -764,14 +764,42 @@ void SparkDisplayControl::update(bool isInitBoot) {
 
     OperationMode opMode = sparkDC_->operationMode();
     SubMode subMode = sparkDC_->subMode();
+#ifdef TFT_DRIVER_ILI9341
+    static OperationMode previousOpMode = SPARK_MODE_APP;
+    static SubMode previousSubMode = SUB_MODE_PRESET;
+    static bool bootSplashWasDrawn = false;
+    static bool forceFullClear = true;
+
+    bool modeChanged = (opMode != previousOpMode) || (subMode != previousSubMode);
+    bool dataChanged = sparkDC_->consumeDisplayDirty();
+
+    if (isInitBoot) {
+        bootSplashWasDrawn = true;
+    }
+    if (!isInitBoot && bootSplashWasDrawn) {
+        forceFullClear = true;
+        bootSplashWasDrawn = false;
+    }
+    if (modeChanged) {
+        forceFullClear = true;
+    }
+
+    // Event-driven refresh: only redraw when data changed or on state transitions.
+    if (!isInitBoot && !dataChanged && !modeChanged && !forceFullClear) {
+        previousOpMode = opMode;
+        previousSubMode = subMode;
+        return;
+    }
+#endif
 #ifndef TFT_DRIVER_ILI9341
     display_.clearDisplay();
 #else
     // For TFT, avoid full-area clear on every frame. Clear only what this frame needs.
-    if ((opMode == SPARK_MODE_APP && isInitBoot) || opMode == SPARK_MODE_KEYBOARD ||
+    if (forceFullClear || (opMode == SPARK_MODE_APP && isInitBoot) || opMode == SPARK_MODE_KEYBOARD ||
         subMode == SUB_MODE_TUNER) {
         // Full redraw modes
         display_.fillRect(0, 0, scaleX(128), scaleY(64), BLACK);
+        forceFullClear = false;
     }
 #endif
     checkInvertDisplay(subMode);
@@ -828,6 +856,11 @@ void SparkDisplayControl::update(bool isInitBoot) {
     // logDisplay();
 #ifndef TFT_DRIVER_ILI9341
     display_.display();
+#endif
+
+#ifdef TFT_DRIVER_ILI9341
+    previousOpMode = opMode;
+    previousSubMode = subMode;
 #endif
 }
 

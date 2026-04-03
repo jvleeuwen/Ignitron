@@ -58,6 +58,7 @@ public:
 
     // Check if a preset has been updated (via ack or from Spark)
     void checkForUpdates();
+    bool consumeDisplayDirty();
 
     static bool getAmpName();
     static bool getCurrentPresetNum();
@@ -221,6 +222,7 @@ private:
 
     // keep track which HW presets have been read so far
     static bool isInitBoot_;
+    static bool displayDirty_;
     static byte specialMsgNum;
 
     static byte nextMessageNum;

@@ -51,6 +51,7 @@ BatteryLevel SparkDataControl::batteryLevel_ = BATTERY_LEVEL_0;
 #endif
 
 bool SparkDataControl::isInitBoot_ = true;
+bool SparkDataControl::displayDirty_ = true;
 byte SparkDataControl::specialMsgNum = 0xEE;
 
 SparkDataControl::SparkDataControl() {
@@ -366,6 +367,7 @@ void SparkDataControl::checkForUpdates() {
     if (msgQueue.size() > 0) {
         processSparkData(msgQueue.front());
         msgQueue.pop();
+        displayDirty_ = true;
     }
 
     SparkPresetControl::getInstance().checkForUpdates(operationMode_);
@@ -380,12 +382,14 @@ void SparkDataControl::checkForUpdates() {
     if (statusObject.isLooperSettingUpdated()) {
         looperControl_.setLooperSetting(statusObject.currentLooperSetting());
         statusObject.resetLooperSettingUpdateFlag();
+        displayDirty_ = true;
     }
 
     const LooperSetting &looperSetting = looperControl_.looperSetting();
     if (looperSetting.changePending) {
         updateLooperSettings();
         looperControl_.resetChangePending();
+        displayDirty_ = true;
     }
 
 #ifdef ENABLE_BATTERY_STATUS_INDICATOR
@@ -423,6 +427,12 @@ void SparkDataControl::checkForUpdates() {
             }
         }
     }
+}
+
+bool SparkDataControl::consumeDisplayDirty() {
+    bool isDirty = displayDirty_;
+    displayDirty_ = false;
+    return isDirty;
 }
 
 void SparkDataControl::processSparkData(ByteVector &blk) {
