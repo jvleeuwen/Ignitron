@@ -66,7 +66,14 @@ void SparkBTControl::initBLE(notify_callback notifyCallback) {
 }
 
 void SparkBTControl::setAdvertisedDevice(NimBLEAdvertisedDevice *device) {
-    advDevice_ = device;
+    if (!device) {
+        return;
+    }
+    if (!advDevice_) {
+        advDevice_ = new NimBLEAdvertisedDevice(*device);
+    } else {
+        *advDevice_ = *device;
+    }
 }
 
 void SparkBTControl::scanEndedCB(NimBLEScanResults results) {

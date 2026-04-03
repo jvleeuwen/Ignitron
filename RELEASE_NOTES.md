@@ -1,5 +1,10 @@
 # Release Notes
 
+## 1.9.1.11 - 2026-04-03
+- Fixed advertised-device lifetime handling by copying scan results into owned storage before connect.
+- Added connected-client guard before notification subscription service lookup to prevent crash in `getService`.
+- Finalized APP-mode amp connection stability around scan/connect/subscribe sequencing.
+
 ## 1.9.1.10 - 2026-04-03
 - Fixed amp connection crash during notification subscription (`NimBLEClient::getService`) by hardening client/descriptor checks.
 - Added self-advertisement filtering during BLE scan to avoid self-connect loops.
