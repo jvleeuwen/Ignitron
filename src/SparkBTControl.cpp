@@ -491,7 +491,6 @@ void SparkBTControl::onConnect(NimBLEServer *pServer_,
 // APP mode
 void SparkBTControl::onConnect(NimBLEClient *pClient_) {
     NimBLEClientCallbacks::onConnect(pClient_);
-    spark_dc_->getAmpName();
 }
 
 // AMP mode when App is disconnected

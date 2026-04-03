@@ -1168,6 +1168,11 @@ bool SparkDataControl::checkBLEConnection() {
         if (bleControl->connectToServer()) {
             if (bleControl->subscribeToNotifications(&bleNotificationCallback)) {
                 Serial.println("BLE connection to Spark established.");
+                // Bootstrap state only after notifications are active; otherwise
+                // early responses can be missed and the display keeps stale profile data.
+                getAmpName();
+                getCurrentPresetNum();
+                getCurrentPresetFromSpark();
                 return true;
             }
             Serial.println("Failed to subscribe, restarting scan");
