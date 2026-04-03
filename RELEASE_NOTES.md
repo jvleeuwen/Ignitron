@@ -1,5 +1,9 @@
 # Release Notes
 
+## 1.9.1.34 - 2026-04-03
+- Fixed APP-mode first-connection startup race that could trigger profile/preset requests before Spark notification subscription was active, causing an initial subscribe failure/reconnect cycle.
+- Added explicit amp-notification-subscription tracking in BLE client state and gated boot-time response-chain requests (`amp name`/`checksums`/`current preset`) to run only when notifications are confirmed active.
+
 ## 1.9.1.33 - 2026-04-03
 - Fixed APP-mode startup profile sync race where Ignitron could miss the amp's initial profile/preset responses because the first request was sent before notification subscription completed.
 - Moved initial state bootstrap to post-subscribe and now explicitly requests amp name, current preset number, and current preset right after BLE connection is established, so the active profile is shown reliably.

@@ -111,6 +111,7 @@ bool SparkBTControl::connectToServer() {
     if (!advDevice_) {
         Serial.println("No advertised Spark device selected");
         isAmpConnected_ = false;
+        isAmpNotifySubscribed_ = false;
         return false;
     }
 
@@ -124,6 +125,7 @@ bool SparkBTControl::connectToServer() {
     if (NimBLEDevice::getClientListSize() >= NIMBLE_MAX_CONNECTIONS) {
         Serial.println("Max clients reached - no more connections available");
         isAmpConnected_ = false;
+        isAmpNotifySubscribed_ = false;
         return false;
     }
 
@@ -138,6 +140,7 @@ bool SparkBTControl::connectToServer() {
         client_ = nullptr;
         Serial.println("Failed to connect, deleted client");
         isAmpConnected_ = false;
+        isAmpNotifySubscribed_ = false;
         return false;
     }
 
@@ -148,9 +151,11 @@ bool SparkBTControl::connectToServer() {
         NimBLEDevice::deleteClient(client_);
         client_ = nullptr;
         isAmpConnected_ = false;
+        isAmpNotifySubscribed_ = false;
         return false;
     }
     isAmpConnected_ = true;
+    isAmpNotifySubscribed_ = false;
     return true;
 }
 
@@ -165,6 +170,7 @@ bool SparkBTControl::subscribeToNotifications(notify_callback notifyCallback) {
             Serial.println("Rejecting notification subscribe for mismatched peer address");
             client_->disconnect();
             isAmpConnected_ = false;
+            isAmpNotifySubscribed_ = false;
             return false;
         }
         service = client_->getService(SPARK_BLE_SERVICE_UUID);
@@ -187,13 +193,16 @@ bool SparkBTControl::subscribeToNotifications(notify_callback notifyCallback) {
                         Serial.println("Subscribe failed, disconnecting");
                         // Disconnect if subscribe failed
                         client_->disconnect();
+                        isAmpNotifySubscribed_ = false;
                         return false;
                     }
+                    isAmpNotifySubscribed_ = true;
                 }
 
             } else {
                 Serial.printf("%s characteristic not found.\n",
                               SPARK_BLE_NOTIF_CHAR_UUID);
+                isAmpNotifySubscribed_ = false;
                 return false;
             }
 
@@ -202,12 +211,14 @@ bool SparkBTControl::subscribeToNotifications(notify_callback notifyCallback) {
         } // pSrv
         else {
             Serial.printf("Service %s not found.\n", SPARK_BLE_SERVICE_UUID);
+            isAmpNotifySubscribed_ = false;
             return false;
         }
     } // client_
     else {
         Serial.print("Client not found! Need reconnection");
         isAmpConnected_ = false;
+        isAmpNotifySubscribed_ = false;
         return false;
     }
 }
@@ -510,6 +521,7 @@ void SparkBTControl::onDisconnect(NimBLEServer *pServer_) {
 // APP mode when Amp is disconnected
 void SparkBTControl::onDisconnect(NimBLEClient *pClient_) {
     isAmpConnected_ = false;
+    isAmpNotifySubscribed_ = false;
     isConnectionFound_ = false;
     if (!(NimBLEDevice::getScan()->isScanning())) {
         startScan();

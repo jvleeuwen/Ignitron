@@ -929,7 +929,7 @@ void SparkDataControl::handleAppModeResponse() {
             DEBUG_PRINTLN("Last message was amp name.");
             sparkAmpName = statusObject.ampName();
             setAmpParameters();
-            if (!bleControl->isAppConnected()) {
+            if (!bleControl->isAppConnected() && bleControl->isAmpNotifySubscribed()) {
                 getHWChecksums();
             }
             printMessage = true;
@@ -939,7 +939,7 @@ void SparkDataControl::handleAppModeResponse() {
         if (lastMessageType == MSG_TYPE_AMP_SERIAL) {
             DEBUG_PRINTLN("Last message was serial number.");
             // reading HW checksums for cache
-            if (!bleControl->isAppConnected()) {
+            if (!bleControl->isAppConnected() && bleControl->isAmpNotifySubscribed()) {
                 getAmpName();
             }
             printMessage = true;
@@ -952,7 +952,7 @@ void SparkDataControl::handleAppModeResponse() {
             // In APP mode the amp is the source of truth; do not restore and push a
             // cached last preset on boot, because that can overwrite the preset that
             // is currently selected on the amp.
-            if (!bleControl->isAppConnected()) {
+            if (!bleControl->isAppConnected() && bleControl->isAmpNotifySubscribed()) {
                 getCurrentPresetFromSpark();
             }
         }
