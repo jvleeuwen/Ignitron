@@ -1,5 +1,9 @@
 # Release Notes
 
+## 1.9.1.17 - 2026-04-03
+- Fixed APP-mode request forwarding to rebuild valid amp requests from parsed Spark app request types instead of sending empty payloads.
+- Replaced single pending-request tracking with multi-request tracking so back-to-back app startup requests can be matched to amp responses correctly.
+
 ## 1.9.1.16 - 2026-04-03
 - Fixed the temporary BLE bridge diagnostics to use the actual parser status enum values exposed by `SparkStreamReader`.
 - Resolves the build failure introduced by the first debug-logging pass.

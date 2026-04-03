@@ -223,8 +223,7 @@ private:
     // keep track which HW presets have been read so far
     static bool isInitBoot_;
     static bool displayDirty_;
-    static bool hasPendingAppRequest_;
-    static byte pendingAppRequestMsgNum_;
+    static deque<byte> pendingAppRequestMsgNums_;
     static byte specialMsgNum;
 
     static byte nextMessageNum;
@@ -244,6 +243,7 @@ private:
     static void handleSendingAck(const ByteVector &blk);
     static void handleAmpModeRequest();
     static void handleAppModeResponse();
+    static vector<CmdData> buildAppModeBridgeRequest(MessageType requestType, byte msgNum);
     static void handleIncomingAck();
 
     // Read in all HW presets

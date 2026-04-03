@@ -12,6 +12,17 @@ const char *bridgeBool(bool value) {
     return value ? "yes" : "no";
 }
 
+bool hasPendingAppRequestMsg(const deque<byte> &pendingMsgs, byte msgNum) {
+    return find(pendingMsgs.begin(), pendingMsgs.end(), msgNum) != pendingMsgs.end();
+}
+
+void clearPendingAppRequestMsg(deque<byte> &pendingMsgs, byte msgNum) {
+    auto it = find(pendingMsgs.begin(), pendingMsgs.end(), msgNum);
+    if (it != pendingMsgs.end()) {
+        pendingMsgs.erase(it);
+    }
+}
+
 const char *bridgeProcessStatusName(MessageProcessStatus status) {
     switch (status) {
     case MSG_PROCESS_RES_COMPLETE:
@@ -90,8 +101,7 @@ BatteryLevel SparkDataControl::batteryLevel_ = BATTERY_LEVEL_0;
 
 bool SparkDataControl::isInitBoot_ = true;
 bool SparkDataControl::displayDirty_ = true;
-bool SparkDataControl::hasPendingAppRequest_ = false;
-byte SparkDataControl::pendingAppRequestMsgNum_ = 0x00;
+deque<byte> SparkDataControl::pendingAppRequestMsgNums_ = {};
 byte SparkDataControl::specialMsgNum = 0xEE;
 
 SparkDataControl::SparkDataControl() {
@@ -496,43 +506,57 @@ void SparkDataControl::processSparkData(ByteVector &blk) {
                       bridgeProcessStatusName(retCode),
                       statusObject.lastMessageType(),
                       statusObject.lastMessageNum(),
-                      bridgeBool(hasPendingAppRequest_),
-                      pendingAppRequestMsgNum_);
+                      bridgeBool(!pendingAppRequestMsgNums_.empty()),
+                      pendingAppRequestMsgNums_.empty() ? 0x00 : pendingAppRequestMsgNums_.front());
     }
     if (retCode == MSG_PROCESS_RES_REQUEST && operationMode_ == SPARK_MODE_AMP) {
         handleAmpModeRequest();
     }
     if (retCode == MSG_PROCESS_RES_REQUEST && operationMode_ == SPARK_MODE_APP) {
-        // In APP mode, requests arriving from Spark app via BLE server must be forwarded to the amp.
-        vector<CmdData> appRequest = sparkSsr.lastMessage();
-        pendingAppRequestMsgNum_ = statusObject.lastMessageNum();
-        hasPendingAppRequest_ = true;
+        // In APP mode, requests arriving from Spark app via BLE server must be rebuilt and forwarded to the amp.
+        MessageType requestType = statusObject.lastMessageType();
+        byte requestMsgNum = statusObject.lastMessageNum();
+        vector<CmdData> appRequest = buildAppModeBridgeRequest(requestType, requestMsgNum);
         Serial.printf("[bridge] app request captured msg=%02X chunks=%u type=%d\n",
-                      pendingAppRequestMsgNum_,
+                      requestMsgNum,
                       static_cast<unsigned int>(appRequest.size()),
-                      statusObject.lastMessageType());
+                      requestType);
+        if (requestType == MSG_REQ_72) {
+            Serial.printf("[bridge] responding locally to app request msg=%02X type=%d\n",
+                          requestMsgNum,
+                          requestType);
+            bleControl->notifyClients(appRequest);
+        } else if (appRequest.size() > 0) {
+            pendingAppRequestMsgNums_.push_back(requestMsgNum);
+        } else {
+            Serial.printf("[bridge] unable to map app request msg=%02X type=%d\n",
+                          requestMsgNum,
+                          requestType);
+        }
         for (auto &chunk : appRequest) {
             ByteVector data = chunk.data;
             logBridgeFrameSummary("forward app->amp", data);
-            bleControl->writeBLE(data, true, false);
+            if (requestType != MSG_REQ_72) {
+                bleControl->writeBLE(data, true, false);
+            }
         }
     }
     if (retCode == MSG_PROCESS_RES_COMPLETE) {
         if (operationMode_ == SPARK_MODE_APP && isMessageFromSpark &&
-            hasPendingAppRequest_ && statusObject.lastMessageNum() == pendingAppRequestMsgNum_) {
+            hasPendingAppRequestMsg(pendingAppRequestMsgNums_, statusObject.lastMessageNum())) {
             // Forward only amp responses that correspond to an actual app-originated request.
             Serial.printf("[bridge] forwarding amp response to app msg=%02X chunks=%u type=%d\n",
                           statusObject.lastMessageNum(),
                           static_cast<unsigned int>(sparkSsr.lastMessage().size()),
                           statusObject.lastMessageType());
             bleControl->notifyClients(sparkSsr.lastMessage());
-            hasPendingAppRequest_ = false;
+            clearPendingAppRequestMsg(pendingAppRequestMsgNums_, statusObject.lastMessageNum());
         } else if (operationMode_ == SPARK_MODE_APP && isMessageFromSpark) {
             Serial.printf("[bridge] ignoring amp response msg=%02X type=%d pending=%s pendingMsg=%02X\n",
                           statusObject.lastMessageNum(),
                           statusObject.lastMessageType(),
-                          bridgeBool(hasPendingAppRequest_),
-                          pendingAppRequestMsgNum_);
+                          bridgeBool(!pendingAppRequestMsgNums_.empty()),
+                          pendingAppRequestMsgNums_.empty() ? 0x00 : pendingAppRequestMsgNums_.front());
         } else if (operationMode_ == SPARK_MODE_APP && isMessageToSpark) {
             Serial.printf("[bridge] completed app-originated message msg=%02X type=%d\n",
                           statusObject.lastMessageNum(),
@@ -679,6 +703,38 @@ bool SparkDataControl::sendNextRequest() {
         }
     }
     return false;
+}
+
+vector<CmdData> SparkDataControl::buildAppModeBridgeRequest(MessageType requestType, byte msgNum) {
+    switch (requestType) {
+    case MSG_REQ_SERIAL:
+        return sparkMsg.getSerialNumber(msgNum);
+    case MSG_REQ_FW_VER:
+        return sparkMsg.getFirmwareVersion(msgNum);
+    case MSG_REQ_PRESET_CHK:
+        if (sparkAmpName == AMP_NAME_SPARK_2) {
+            return sparkMsg.getHWChecksumsExtended(msgNum);
+        }
+        return sparkMsg.getHwChecksums(msgNum);
+    case MSG_REQ_CURR_PRESET_NUM:
+        return sparkMsg.getCurrentPresetNum(msgNum);
+    case MSG_REQ_CURR_PRESET:
+        return sparkMsg.getCurrentPreset(msgNum, -1);
+    case MSG_REQ_AMP_STATUS:
+        return sparkMsg.getAmpStatus(msgNum);
+    case MSG_REQ_PRESET1:
+        return sparkMsg.getCurrentPreset(msgNum, 1);
+    case MSG_REQ_PRESET2:
+        return sparkMsg.getCurrentPreset(msgNum, 2);
+    case MSG_REQ_PRESET3:
+        return sparkMsg.getCurrentPreset(msgNum, 3);
+    case MSG_REQ_PRESET4:
+        return sparkMsg.getCurrentPreset(msgNum, 4);
+    case MSG_REQ_72:
+        return sparkMsg.sendResponse72(msgNum);
+    default:
+        return {};
+    }
 }
 
 void SparkDataControl::handleSendingAck(const ByteVector &blk) {
