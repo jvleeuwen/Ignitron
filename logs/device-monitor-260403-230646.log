@@ -1,0 +1,140 @@
+gsip: 0, SPIWP:0xee
+clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+mode:DIO, clock div:2
+load:0x3fff0030,len:1184
+load:0x40078000,len:13232
+load:0x40080400,len:3028
+entry 0x400805e4
+Initializing
+Operation mode (boot): 1
+Reading opmode file.
+Spark mode config file does not exist.
+Initializing PresetBuilder
+Reading custom presets from filesystem.
+Initializing APP modeStarting NimBLE Server
+Advertising Started
+Starting scan
+Operation mode: 1
+======= Entering APP mode =======
+Initialization done.
+Found Spark candidate f7:eb:ed:5b:38:23 ( Spark 40 BLE), connecting.
+Scan ended.
+Connected to: f7:eb:ed:5b:38:23
+Subscribing to service notifications of FFC2
+Notifications turned on
+Done with this device.
+BLE connection to Spark established.
+[ble] ign->amp len=23 dir=to-spark hdr=53FE
+[ble] ign->amp len=23 dir=to-spark hdr=53FE
+Getting current preset from Spark
+[ble] ign->amp len=26 dir=to-spark hdr=53FE
+[ble] ign->amp len=23 dir=to-spark hdr=53FE
+[bridge] ignoring amp response msg=04 type=7 pending=no pendingMsg=00
+[ble] ign->amp len=23 dir=to-spark hdr=53FE
+Message processed:
+{"Serial Number": "S040C6118625"}
+
+abort() was called at PC 0x401c0db7 on core 1
+
+
+Backtrace: 0x40083895:0x3ffcf360 0x40094c2d:0x3ffcf380 0x4009a74d:0x3ffcf3a0 0x401c0db7:0x3ffcf420 0x401c0dfe:0x3ffcf440 0x401c0d5f:0x3ffcf460 0x401c6fa7:0x3ffcf480 0x400e1d1a:0x3ffcf720 0x400ec1a1:0x3ffcf740 0x400ee426:0x3ffcf870 0x400ee7f2:0x3ffcf970 0x400d996a:0x3ffcf990 0x400d263e:0x3ffcfa60 0x4010d171:0x3ffcfa80
+  #0  0x40083895 in panic_abort at /home/runner/work/esp32-arduino-lib-builder/esp32-arduino-lib-builder/esp-idf/components/esp_system/panic.c:408
+  #1  0x40094c2d in esp_system_abort at /home/runner/work/esp32-arduino-lib-builder/esp32-arduino-lib-builder/esp-idf/components/esp_system/esp_system.c:137
+  #2  0x4009a74d in abort at /home/runner/work/esp32-arduino-lib-builder/esp32-arduino-lib-builder/esp-idf/components/newlib/abort.c:46
+  #3  0x401c0db7 in __cxxabiv1::__terminate(void (*)()) at /builds/idf/crosstool-NG/.build/HOST-x86_64-w64-mingw32/xtensa-esp32-elf/src/gcc/libstdc++-v3/libsupc++/eh_terminate.cc:47
+  #4  0x401c0dfe in std::terminate() at /builds/idf/crosstool-NG/.build/HOST-x86_64-w64-mingw32/xtensa-esp32-elf/src/gcc/libstdc++-v3/libsupc++/eh_terminate.cc:57
+  #5  0x401c0d5f in __cxa_throw at /builds/idf/crosstool-NG/.build/HOST-x86_64-w64-mingw32/xtensa-esp32-elf/src/gcc/libstdc++-v3/libsupc++/eh_throw.cc:95
+  #6  0x401c6fa7 in std::__throw_out_of_range_fmt(char const*, ...) at /builds/idf/crosstool-NG/.build/HOST-x86_64-w64-mingw32/xtensa-esp32-elf/src/gcc/libstdc++-v3/src/c++11/functexcept.cc:96 (discriminator 2)
+  #7  0x400e1d1a in std::vector<Preset, std::allocator<Preset> >::_M_range_check(unsigned int) const at c:\users\jellevanleeuwen\.platformio\packages\toolchain-xtensa-esp32\xtensa-esp32-elf\include\c++\8.4.0\bits/stl_vector.h:960
+      (inlined by) std::vector<Preset, std::allocator<Preset> >::at(unsigned int) at c:\users\jellevanleeuwen\.platformio\packages\toolchain-xtensa-esp32\xtensa-esp32-elf\include\c++\8.4.0\bits/stl_vector.h:981
+  #8  0x400ec1a1 in SparkPresetBuilder::getPreset(int, int) at src/SparkPresetBuilder.cpp:249
+  #9  0x400ee426 in SparkPresetControl::setActiveHWPreset() at src/SparkPresetControl.cpp:245
+  #10 0x400ee7f2 in SparkPresetControl::checkForUpdates(int) at src/SparkPresetControl.cpp:102
+  #11 0x400d996a in SparkDataControl::checkForUpdates() at src/SparkDataControl.cpp:447
+  #12 0x400d263e in loop() at C:/Users/JellevanLeeuwen/git/Ignitron/Ignitron.ino:123
+  #13 0x4010d171 in loopTask(void*) at C:/Users/JellevanLeeuwen/.platformio/packages/framework-arduinoespressif32/cores/esp32/main.cpp:50
+
+
+
+
+
+ELF file SHA256: 0a19f1e12e6be8c0
+
+Rebooting...
+ets Jul 29 2019 12:21:46
+
+rst:0xc (SW_CPU_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+configsip: 0, SPIWP:0xee
+clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+mode:DIO, clock div:2
+load:0x3fff0030,len:1184
+load:0x40078000,len:13232
+load:0x40080400,len:3028
+entry 0x400805e4
+Initializing
+Operation mode (boot): 1
+Reading opmode file.
+Spark mode config file does not exist.
+Initializing PresetBuilder
+Reading custom presets from filesystem.
+Initializing APP modeStarting NimBLE Server
+Advertising Started
+Starting scan
+Operation mode: 1
+======= Entering APP mode =======
+Initialization done.
+Found Spark candidate f7:eb:ed:5b:38:23 ( Spark 40 BLE), connecting.
+Scan ended.
+Failed to connect, deleted client
+Failed to connect, starting scan
+Resetting Status
+deserializeJson() failed with code IncompleteInput
+Checksum not found, trying legacy format.
+Scan initiated
+Scan ended.
+Connected to: f7:eb:ed:5b:38:23
+Getting current preset from Spark
+Characteristic �'�? not found. Disconnecting client.
+���? characteristic not found.
+Failed to subscribe, restarting scan
+Resetting Status
+Resetting Status
+deserializeJson() failed with code IncompleteInput
+deserializeJson() failed with code IncompleteInput
+Checksum not found, trying legacy format.
+Checksum not found, trying legacy format.
+Scan initiated
+Scan initiated
+Found Spark candidate f7:eb:ed:5b:38:23 ( Spark 40 BLE), connecting.
+Scan ended.
+Connected to: f7:eb:ed:5b:38:23
+Subscribing to service notifications of FFC2
+Notifications turned on
+Done with this device.
+BLE connection to Spark established.
+[ble] ign->amp len=23 dir=to-spark hdr=53FE
+[ble] ign->amp len=23 dir=to-spark hdr=53FE
+Getting current preset from Spark
+[ble] ign->amp len=26 dir=to-spark hdr=53FE
+[ble] ign->amp len=23 dir=to-spark hdr=53FE
+[bridge] ignoring amp response msg=04 type=7 pending=no pendingMsg=00
+[ble] ign->amp len=23 dir=to-spark hdr=53FE
+Message processed:
+{"Serial Number": "S040C6118625"}
+Getting current preset from Spark
+[ble] ign->amp len=26 dir=to-spark hdr=53FE
+Getting current preset from Spark
+[bridge] ignoring amp response msg=06 type=1 pending=no pendingMsg=00
+Message processed:
+{"PresetNumber": 0, "UUID": "21F51633-F755-40C9-987E-C821EFD2976B", 
+"Name": "vox ac30 - worship", "Version": "0.7", "Description": "1-Clean", "Icon": "icon.png", "BPM": 120.0000, 
+"Pedals": [
+{"Name": "bias.noisegate", "IsOn": true, "Parameters":[0.3516, 0.4955, 1.0000]}, 
+{"Name": "Compressor", "IsOn": true, "Parameters":[0.5939, 0.3012]}, 
+{"Name": "DistortionTS9", "IsOn": true, "Parameters":[0.2468, 0.6026, 0.7001, 0.0000]}, 
+{"Name": "AC Boost", "IsOn": true, "Parameters":[0.2441, 0.5968, 0.5041, 0.4517, 0.6525]}, 
+{"Name": "ChorusAnalog", "IsOn": true, "Parameters":[0.4488, 0.2521, 0.3991, 0.3513]}, 
+{"Name": "DelayMono", "IsOn": true, "Parameters":[0.3307, 0.3339, 0.4615, 0.6000, 1.0000]}, 
+{"Name": "bias.reverb", "IsOn": true, "Parameters":[0.5989, 0.4033, 0.7470, 0.7983, 0.2961, 0.6995, 0.5000, 1.0000]}],
+"Checksum": "1A"
+}
