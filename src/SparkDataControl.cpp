@@ -447,6 +447,14 @@ void SparkDataControl::processSparkData(ByteVector &blk) {
     if (retCode == MSG_PROCESS_RES_REQUEST && operationMode_ == SPARK_MODE_AMP) {
         handleAmpModeRequest();
     }
+    if (retCode == MSG_PROCESS_RES_REQUEST && operationMode_ == SPARK_MODE_APP) {
+        // In APP mode, requests arriving from Spark app via BLE server must be forwarded to the amp.
+        vector<CmdData> appRequest = sparkSsr.lastMessage();
+        for (auto &chunk : appRequest) {
+            ByteVector data = chunk.data;
+            bleControl->writeBLE(data, true, false);
+        }
+    }
     if (retCode == MSG_PROCESS_RES_COMPLETE) {
         handleAppModeResponse();
     }

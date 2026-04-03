@@ -1,5 +1,9 @@
 # Release Notes
 
+## 1.9.1.12 - 2026-04-03
+- Added APP-mode request forwarding from Spark app BLE server path to Spark amp BLE client path.
+- Prevents Spark app timeout/disconnect after subscribe caused by missing request bridge handling.
+
 ## 1.9.1.11 - 2026-04-03
 - Fixed advertised-device lifetime handling by copying scan results into owned storage before connect.
 - Added connected-client guard before notification subscription service lookup to prevent crash in `getService`.
