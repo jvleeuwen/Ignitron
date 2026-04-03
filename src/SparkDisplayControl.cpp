@@ -731,6 +731,17 @@ void SparkDisplayControl::checkInvertDisplay(int subMode) {
 
 void SparkDisplayControl::update(bool isInitBoot) {
 
+#ifdef TFT_DRIVER_ILI9341
+    // BLE traffic can trigger very frequent UI refreshes; cap TFT redraw rate to reduce flicker.
+    static unsigned long lastTftFrameTimestamp = 0;
+    const unsigned long minTftFrameIntervalMs = 45;
+    unsigned long nowMs = millis();
+    if (!isInitBoot && (nowMs - lastTftFrameTimestamp) < minTftFrameIntervalMs) {
+        return;
+    }
+    lastTftFrameTimestamp = nowMs;
+#endif
+
     OperationMode opMode = sparkDC_->operationMode();
     SubMode subMode = sparkDC_->subMode();
 #ifndef TFT_DRIVER_ILI9341
