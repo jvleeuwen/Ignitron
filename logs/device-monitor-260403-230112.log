@@ -5,3 +5,69 @@ load:0x3fff0030,len:1184
 load:0x40078000,len:13232
 load:0x40080400,len:3028
 entry 0x400805e4
+Initializing
+Operation mode (boot): 1
+Reading opmode file.
+Spark mode config file does not exist.
+Initializing PresetBuilder
+Reading custom presets from filesystem.
+Initializing APP modeStarting NimBLE Server
+Advertising Started
+Starting scan
+Operation mode: 1
+======= Entering APP mode =======
+Initialization done.
+Found Spark candidate f7:eb:ed:5b:38:23 ( Spark 40 BLE), connecting.
+Scan ended.
+Connected to: f7:eb:ed:5b:38:23
+Getting current preset from Spark
+Characteristic |'�? not found. Disconnecting client.
+���? characteristic not found.
+Failed to subscribe, restarting scan
+Resetting Status
+Resetting Status
+deserializeJson() failed with code IncompleteInputdeserializeJson() failed with code 
+IncompleteInput
+Checksum not found, trying legacy format.
+Checksum not found, trying legacy format.
+Scan initiatedScan initiated
+
+Found Spark candidate f7:eb:ed:5b:38:23 ( Spark 40 BLE), connecting.
+Scan ended.
+Failed to connect, deleted client
+Failed to connect, starting scan
+Resetting Status
+deserializeJson() failed with code IncompleteInput
+Checksum not found, trying legacy format.
+Scan initiated
+Scan ended.
+Connected to: f7:eb:ed:5b:38:23
+Subscribing to service notifications of FFC2
+Notifications turned on
+Done with this device.
+BLE connection to Spark established.
+[ble] ign->amp len=23 dir=to-spark hdr=53FE
+[ble] ign->amp len=23 dir=to-spark hdr=53FE
+Getting current preset from Spark
+[ble] ign->amp len=26 dir=to-spark hdr=53FE
+[ble] ign->amp len=23 dir=to-spark hdr=53FE
+[bridge] ignoring amp response msg=04 type=7 pending=no pendingMsg=00
+[ble] ign->amp len=23 dir=to-spark hdr=53FE
+Message processed:
+{"Serial Number": "S040C6118625"}
+Getting current preset from Spark
+[ble] ign->amp len=26 dir=to-spark hdr=53FE
+[bridge] ignoring amp response msg=06 type=1 pending=no pendingMsg=00
+Message processed:
+{"PresetNumber": 0, "UUID": "21F51633-F755-40C9-987E-C821EFD2976B", 
+"Name": "vox ac30 - worship", "Version": "0.7", "Description": "1-Clean", "Icon": "icon.png", "BPM": 120.0000, 
+"Pedals": [
+{"Name": "bias.noisegate", "IsOn": true, "Parameters":[0.3516, 0.4955, 1.0000]}, 
+{"Name": "Compressor", "IsOn": true, "Parameters":[0.5939, 0.3012]}, 
+{"Name": "DistortionTS9", "IsOn": true, "Parameters":[0.2468, 0.6026, 0.7001, 0.0000]}, 
+{"Name": "AC Boost", "IsOn": true, "Parameters":[0.2362, 0.5968, 0.5041, 0.4517, 0.6525]}, 
+{"Name": "ChorusAnalog", "IsOn": true, "Parameters":[0.4488, 0.2521, 0.3991, 0.3513]}, 
+{"Name": "DelayMono", "IsOn": true, "Parameters":[0.3307, 0.3339, 0.4615, 0.6000, 1.0000]}, 
+{"Name": "bias.reverb", "IsOn": true, "Parameters":[0.5989, 0.4033, 0.7470, 0.7983, 0.2961, 0.6995, 0.5000, 1.0000]}],
+"Checksum": "E2"
+}
