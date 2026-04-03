@@ -1,5 +1,9 @@
 # Release Notes
 
+## 1.9.1.25 - 2026-04-03
+- Fixed APP-mode tuner exit behavior where late tuner-output frames could force Ignitron back into tuner submode after tuner was turned off in Spark app.
+- Tuner submode is now toggled only by explicit tuner on/off messages.
+
 ## 1.9.1.24 - 2026-04-03
 - Fixed APP-mode tuner handling to stop sending `switchTuner(false)` when tuner output is received while not in tuner submode.
 - Tuner on/off messages from amp now update Ignitron submode/display locally without echoing redundant tuner commands back to amp.

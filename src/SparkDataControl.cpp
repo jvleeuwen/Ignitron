@@ -983,12 +983,10 @@ void SparkDataControl::handleAppModeResponse() {
         }
 
         if (lastMessageType == MSG_TYPE_TUNER_OUTPUT) {
-            // Amp is sending tuner data; reflect tuner mode locally without
-            // echoing another tuner command back to the amp.
-            if (subMode_ != SUB_MODE_TUNER) {
-                Serial.println("Tuner output received, entering tuner mode.");
-                subMode_ = SUB_MODE_TUNER;
-                SparkPresetControl::getInstance().updatePendingWithActive();
+            // Tuner output frames can still arrive briefly after tuner-off.
+            // Do not switch submode here; only explicit tuner on/off messages
+            // should toggle tuner mode.
+            if (subMode_ == SUB_MODE_TUNER) {
                 displayDirty_ = true;
             }
         }
