@@ -514,6 +514,7 @@ void SparkBTControl::onConnect(NimBLEClient *pClient_) {
 void SparkBTControl::onDisconnect(NimBLEServer *pServer_) {
     Serial.println("Client disconnected");
     isAppConnectedBLE_ = false;
+    spark_dc_->clearPendingAppRequests();
     notificationCount = 0;
     Serial.println("Start advertising");
     NimBLEDevice::startAdvertising();

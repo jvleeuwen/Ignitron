@@ -495,6 +495,10 @@ bool SparkDataControl::consumeDisplayDirty() {
     return isDirty;
 }
 
+void SparkDataControl::clearPendingAppRequests() {
+    pendingAppRequestMsgNums_.clear();
+}
+
 void SparkDataControl::processSparkData(ByteVector &blk) {
 
     /*DEBUG_PRINT("Received data: ");
@@ -559,8 +563,7 @@ void SparkDataControl::processSparkData(ByteVector &blk) {
         }
     }
     if (retCode == MSG_PROCESS_RES_COMPLETE) {
-        if (operationMode_ == SPARK_MODE_APP && isMessageFromSpark &&
-            hasPendingAppRequestMsg(pendingAppRequestMsgNums_, statusObject.lastMessageNum())) {
+        if (operationMode_ == SPARK_MODE_APP && isMessageFromSpark && bleControl->isAppConnected()) {
             vector<ByteVector> rawBlocks = sparkSsr.lastResponse();
             vector<CmdData> appResponse = rawBlocksToCmdData(rawBlocks);
             // Forward only amp responses that correspond to an actual app-originated request.
@@ -569,7 +572,9 @@ void SparkDataControl::processSparkData(ByteVector &blk) {
                           static_cast<unsigned int>(appResponse.size()),
                           statusObject.lastMessageType());
             bleControl->notifyClients(appResponse);
-            clearPendingAppRequestMsg(pendingAppRequestMsgNums_, statusObject.lastMessageNum());
+            if (hasPendingAppRequestMsg(pendingAppRequestMsgNums_, statusObject.lastMessageNum())) {
+                clearPendingAppRequestMsg(pendingAppRequestMsgNums_, statusObject.lastMessageNum());
+            }
         } else if (operationMode_ == SPARK_MODE_APP && isMessageFromSpark) {
             Serial.printf("[bridge] ignoring amp response msg=%02X type=%d pending=%s pendingMsg=%02X\n",
                           statusObject.lastMessageNum(),

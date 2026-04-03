@@ -59,6 +59,7 @@ public:
     // Check if a preset has been updated (via ack or from Spark)
     void checkForUpdates();
     bool consumeDisplayDirty();
+    static void clearPendingAppRequests();
 
     static bool getAmpName();
     static bool getCurrentPresetNum();
