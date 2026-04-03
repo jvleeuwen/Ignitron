@@ -1,5 +1,9 @@
 # Release Notes
 
+## 1.9.1.24 - 2026-04-03
+- Fixed APP-mode tuner handling to stop sending `switchTuner(false)` when tuner output is received while not in tuner submode.
+- Tuner on/off messages from amp now update Ignitron submode/display locally without echoing redundant tuner commands back to amp.
+
 ## 1.9.1.23 - 2026-04-03
 - Fixed APP-mode disconnect on tuner/submode events by preventing BLE keyboard start/stop calls outside KEYBOARD mode.
 - Avoids `Stopping advertising keyboard` side effects during Spark app sessions.
