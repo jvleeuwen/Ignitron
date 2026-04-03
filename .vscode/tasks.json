@@ -11,6 +11,18 @@
 				"esp32dev"
 			],
 			"isBackground": false
+		},
+		{
+			"label": "Build esp32dev verify",
+			"type": "shell",
+			"command": "platformio",
+			"args": [
+				"run",
+				"--environment",
+				"esp32dev"
+			],
+			"isBackground": false,
+			"group": "build"
 		}
 	]
 }

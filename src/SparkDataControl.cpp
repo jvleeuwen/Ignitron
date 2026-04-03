@@ -14,14 +14,12 @@ const char *bridgeBool(bool value) {
 
 const char *bridgeProcessStatusName(MessageProcessStatus status) {
     switch (status) {
-    case MSG_PROCESS_RES_NONE:
-        return "none";
-    case MSG_PROCESS_RES_ONGOING:
-        return "ongoing";
-    case MSG_PROCESS_RES_REQUEST:
-        return "request";
     case MSG_PROCESS_RES_COMPLETE:
         return "complete";
+    case MSG_PROCESS_RES_INCOMPLETE:
+        return "incomplete";
+    case MSG_PROCESS_RES_REQUEST:
+        return "request";
     default:
         return "unknown";
     }
@@ -493,7 +491,7 @@ void SparkDataControl::processSparkData(ByteVector &blk) {
     bool isMessageFromSpark = blk.size() >= 6 && blk[4] == 0x41 && blk[5] == 0xFF;
 
     MessageProcessStatus retCode = sparkSsr.processBlock(blk);
-    if (operationMode_ == SPARK_MODE_APP && retCode != MSG_PROCESS_RES_NONE) {
+    if (operationMode_ == SPARK_MODE_APP) {
         Serial.printf("[bridge] parsed status=%s type=%d msg=%02X pending=%s pendingMsg=%02X\n",
                       bridgeProcessStatusName(retCode),
                       statusObject.lastMessageType(),

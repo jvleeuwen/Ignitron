@@ -1,5 +1,9 @@
 # Release Notes
 
+## 1.9.1.16 - 2026-04-03
+- Fixed the temporary BLE bridge diagnostics to use the actual parser status enum values exposed by `SparkStreamReader`.
+- Resolves the build failure introduced by the first debug-logging pass.
+
 ## 1.9.1.15 - 2026-04-03
 - Added targeted APP-mode BLE bridge diagnostics for app writes, amp writes, amp notifications, parser outcomes, and app notifications.
 - New logs make it possible to correlate each bridge step and see whether a response was forwarded, ignored, or never arrived.
