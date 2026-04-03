@@ -1,6 +1,7 @@
 #ifndef SPARKCURRENTSTATUS_H
 #define SPARKCURRENTSTATUS_H
 
+#include "Config_Definitions.h"
 #include "SparkTypes.h"
 
 enum MessageType {
@@ -89,14 +90,16 @@ public:
     const string ampSerialNumber() const { return ampSerialNumber_; }
     string &ampSerialNumber() { return ampSerialNumber_; }
 
-    const BatteryLevel ampBatteryLevel() const { return ampBatteryLevel_; }
-    BatteryLevel &ampBatteryLevel() { return ampBatteryLevel_; }
+#ifdef ENABLE_BATTERY_STATUS_INDICATOR
+    const int ampBatteryLevel() const { return ampBatteryLevel_; }
+    int &ampBatteryLevel() { return ampBatteryLevel_; }
 
     const bool isAmpBatteryPowered() const { return isAmpBatteryPowered_; }
     bool &isAmpBatteryPowered() { return isAmpBatteryPowered_; }
 
     const int ampBatteryChargingStatus() const { return ampBatteryChargingStatus_; }
-    BatteryChargingStatus &ampBatteryChargingStatus() { return ampBatteryChargingStatus_; }
+    int &ampBatteryChargingStatus() { return ampBatteryChargingStatus_; }
+#endif
 
     const float inputVolume() const { return inputVolume_; }
     float &inputVolume() { return inputVolume_; }
@@ -166,9 +169,11 @@ private:
     byte lastMessageNum_ = 0x00;
     byte lastRequestedPreset = 0x00;
 
-    BatteryLevel ampBatteryLevel_ = BATTERY_LEVEL_0;
+#ifdef ENABLE_BATTERY_STATUS_INDICATOR
+    int ampBatteryLevel_ = 0;
     bool isAmpBatteryPowered_ = false;
-    BatteryChargingStatus ampBatteryChargingStatus_ = BATTERY_CHARGING_STATUS_DISCHARGING;
+    int ampBatteryChargingStatus_ = 0;
+#endif
 
     vector<byte> hwChecksums_ = {};
     string ampSerialNumber_ = "";

@@ -53,9 +53,11 @@ void SparkStatus::resetStatus() {
     lastMessageNum_ = 0x00;
     lastRequestedPreset = 0x00;
 
-    ampBatteryLevel_ = BATTERY_LEVEL_0;
+#ifdef ENABLE_BATTERY_STATUS_INDICATOR
+    ampBatteryLevel_ = 0;
     isAmpBatteryPowered_ = false;
-    ampBatteryChargingStatus_ = BATTERY_CHARGING_STATUS_DISCHARGING;
+    ampBatteryChargingStatus_ = 0;
+#endif
 
     hwChecksums_.clear();
 }

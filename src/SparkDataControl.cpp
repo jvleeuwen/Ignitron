@@ -758,8 +758,10 @@ void SparkDataControl::handleAppModeResponse() {
 
         if (lastMessageType == MSG_TYPE_AMPSTATUS) {
             DEBUG_PRINTLN("Last message was amp status");
+#ifdef ENABLE_BATTERY_STATUS_INDICATOR
             int batteryLevel = SparkStatus::getInstance().ampBatteryLevel();
             Serial.printf("Battery level = %d\n", batteryLevel);
+#endif
         }
 
         if (lastMessageType == MSG_TYPE_LOOPER_SETTING) {

@@ -49,10 +49,7 @@ const string VERSION = "1.9.1";
 // When battery is full, VoltageOnADCPin = 12.6V / (5.1k + 15k) * 5.1k ~= 3.197V < 3.3V,
 // so this voltage divider setting is suitable for this need.
 
-// #define ENABLE_BATTERY_STATUS_INDICATOR
-
-#ifdef ENABLE_BATTERY_STATUS_INDICATOR
-const int BATTERY_VOLTAGE_ADC_PIN = 36;
+#define ENABLE_BATTERY_STATUS_INDICATOR
 
 enum BatteryLevel {
     BATTERY_LEVEL_0,           // 0-10%
@@ -62,15 +59,26 @@ enum BatteryLevel {
     BATTERY_LEVEL_CHARGING = 9 // when charging (only used for AMP battery)
 };
 
-// only required for Amp battery
-const float BATTERY_MAX_LEVEL = 4096.0;
-const float BATTERY_MIN_LEVEL = 3480.0;
+enum BatteryChargingStatus {
+    BATTERY_CHARGING_STATUS_DISCHARGING,
+    BATTERY_CHARGING_STATUS_POWERED,
+    BATTERY_CHARGING_STATUS_CHARGING,
+    BATTERY_CHARGING_STATUS_FULL_CHARGED
+};
 
 #define BATTERY_TYPE_LI_ION 0
 #define BATTERY_TYPE_LI_FE_PO4 1
 #define BATTERY_TYPE_AMP 2
 
-#define BATTERY_TYPE BATTERY_TYPE_AMP // Choose from BATTERY_TYPE_LI_ION or BATTERY_TYPE_LI_FE_PO4 for Ignitron internal battery or BATTERY_TYPE_AMP for Spark battery
+#define BATTERY_TYPE BATTERY_TYPE_LI_ION // Choose from BATTERY_TYPE_LI_ION or BATTERY_TYPE_LI_FE_PO4 for Ignitron internal battery or BATTERY_TYPE_AMP for Spark battery
+
+#ifdef ENABLE_BATTERY_STATUS_INDICATOR
+const int BATTERY_VOLTAGE_ADC_PIN = 36;
+
+// only required for Amp battery
+const float BATTERY_MAX_LEVEL = 4096.0;
+const float BATTERY_MIN_LEVEL = 3480.0;
+
 const int BATTERY_CELLS = 3;
 const float VOLTAGE_DIVIDER_R1 = (5.1 * 1000); // 5.1k ohm
 const float VOLTAGE_DIVIDER_R2 = (15 * 1000);  // 15k ohm
@@ -88,14 +96,6 @@ const float BATTERY_CAPACITY_VOLTAGE_THRESHOLD_90 = (BATTERY_MIN_LEVEL + (BATTER
 const float BATTERY_CAPACITY_VOLTAGE_THRESHOLD_50 = (BATTERY_MIN_LEVEL + (BATTERY_MAX_LEVEL - BATTERY_MIN_LEVEL) * 0.4);
 const float BATTERY_CAPACITY_VOLTAGE_THRESHOLD_10 = (BATTERY_MIN_LEVEL + (BATTERY_MAX_LEVEL - BATTERY_MIN_LEVEL) * 0.1);
 #endif
-
-// Define BatteryChargingStatus outside of battery type conditionals so it's always available
-enum BatteryChargingStatus {
-    BATTERY_CHARGING_STATUS_DISCHARGING,
-    BATTERY_CHARGING_STATUS_POWERED,
-    BATTERY_CHARGING_STATUS_CHARGING,
-    BATTERY_CHARGING_STATUS_FULL_CHARGED
-};
 
 #endif
 
