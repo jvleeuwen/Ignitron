@@ -736,9 +736,8 @@ void SparkDisplayControl::update(bool isInitBoot) {
 #ifndef TFT_DRIVER_ILI9341
     display_.clearDisplay();
 #else
-    // Clear only the UI layout area to avoid TFT flicker
-    // Scale the 128x64 OLED region to match current display resolution
-    display_.fillRect(0, 0, scaleX(128), scaleY(64), BLACK);
+    // UI layout is only 128x64 regardless of screen DPI - clear only that region to minimize flicker
+    display_.fillRect(0, 0, 128, 64, BLACK);
 #endif
     checkInvertDisplay(subMode);
 
