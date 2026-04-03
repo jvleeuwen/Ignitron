@@ -1,0 +1,28 @@
+gsip: 0, SPIWP:0xee
+clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+mode:DIO, clock div:2
+load:0x3fff0030,len:1184
+load:0x40078000,len:13232
+load:0x40080400,len:3028
+entry 0x400805e4
+Initializing
+Operation mode (boot): 1
+Reading opmode file.
+Spark mode config file does not exist.
+Initializing PresetBuilder
+Reading custom presets from filesystem.
+Initializing APP modeStarting NimBLE Server
+Advertising Started
+Starting scan
+Operation mode: 1
+======= Entering APP mode =======
+Initialization done.
+Found Spark candidate f7:eb:ed:5b:38:23 ( Spark 40 BLE), connecting.
+Scan ended.
+[ble] ign->amp len=23 dir=to-spark hdr=53FE
+Connected to: f7:eb:ed:5b:38:23
+Subscribing to service notifications of FFC2
+Notifications turned on
+Done with this device.
+BLE connection to Spark established.
+[ble] ign->amp len=23 dir=to-spark hdr=53FE
