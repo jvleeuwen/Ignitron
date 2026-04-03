@@ -185,10 +185,12 @@ OperationMode SparkDataControl::init(OperationMode opModeInput) {
 
 void SparkDataControl::switchSubMode(SubMode subMode) {
     // TODO: Check if that works fine
-    if (subMode == SUB_MODE_LOOPER) {
-        bleKeyboard.start();
-    } else {
-        bleKeyboard.end();
+    if (operationMode_ == SPARK_MODE_KEYBOARD) {
+        if (subMode == SUB_MODE_LOOPER) {
+            bleKeyboard.start();
+        } else {
+            bleKeyboard.end();
+        }
     }
     // Switch off tuner mode at amp if was enabled before but is not matching current subMode
     if (subMode_ == SUB_MODE_TUNER && subMode_ != subMode) {

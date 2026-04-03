@@ -1,5 +1,9 @@
 # Release Notes
 
+## 1.9.1.23 - 2026-04-03
+- Fixed APP-mode disconnect on tuner/submode events by preventing BLE keyboard start/stop calls outside KEYBOARD mode.
+- Avoids `Stopping advertising keyboard` side effects during Spark app sessions.
+
 ## 1.9.1.22 - 2026-04-03
 - In APP mode, completed amp responses are now forwarded to the Spark app while connected even if pending request bookkeeping becomes temporarily out of sync.
 - Added pending-request queue reset on Spark app disconnect to prevent stale message IDs from causing ignored responses after reconnect.
