@@ -1,5 +1,9 @@
 # Release Notes
 
+## 1.9.1.31 - 2026-04-03
+- Fixed APP-mode startup preset sync so Ignitron no longer restores and pushes the last cached preset to the amp on boot; it now reads the amp's current preset instead, preventing unintended CH2 -> CH1 changes.
+- Hardened BLE client connect/subscribe flow to reject mismatched peer addresses before notification subscription, avoiding crashes when a bogus scanned peer is returned after a failed connection attempt.
+
 ## 1.9.1.30 - 2026-04-03
 - Fixed APP-mode Ignitron tuner entry by arming tuner auto-enter from the raw 25-byte app control frames that precede tuner output, instead of relying only on parsed request classification.
 - Matches the actual Spark app tuner-start traffic pattern seen in logs where tuner output was forwarded correctly but Ignitron never switched into tuner mode.

@@ -944,11 +944,12 @@ void SparkDataControl::handleAppModeResponse() {
             printMessage = true;
             SparkPresetControl &presetControl = SparkPresetControl::getInstance();
             presetControl.validateChecksums(statusObject.hwChecksums());
-            // try to load last selected preset from filesystem,
-            // if not available, read current preset from amp
-            if (!bleControl->isAppConnected() && !presetControl.readLastPresetFromFile()) {
+            // In APP mode the amp is the source of truth; do not restore and push a
+            // cached last preset on boot, because that can overwrite the preset that
+            // is currently selected on the amp.
+            if (!bleControl->isAppConnected()) {
                 getCurrentPresetFromSpark();
-            };
+            }
         }
 
         if (lastMessageType == MSG_TYPE_HWPRESET) {

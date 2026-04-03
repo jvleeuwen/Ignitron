@@ -172,6 +172,12 @@ bool SparkBTControl::connectToServer() {
 
     Serial.print("Connected to: ");
     Serial.println(client_->getPeerAddress().toString().c_str());
+    if (!advDevice_ || !client_->getPeerAddress().equals(advDevice_->getAddress())) {
+        Serial.println("Connected peer does not match selected Spark candidate, disconnecting");
+        client_->disconnect();
+        isAmpConnected_ = false;
+        return false;
+    }
     isAmpConnected_ = true;
     return true;
 }
@@ -183,6 +189,12 @@ bool SparkBTControl::subscribeToNotifications(notify_callback notifyCallback) {
     NimBLERemoteCharacteristic *characteristic = nullptr;
 
     if (client_ && client_->isConnected()) {
+        if (!advDevice_ || !client_->getPeerAddress().equals(advDevice_->getAddress())) {
+            Serial.println("Rejecting notification subscribe for mismatched peer address");
+            client_->disconnect();
+            isAmpConnected_ = false;
+            return false;
+        }
         service = client_->getService(SPARK_BLE_SERVICE_UUID);
         if (service) { // make sure it's not null
             characteristic = service->getCharacteristic(SPARK_BLE_NOTIF_CHAR_UUID);
