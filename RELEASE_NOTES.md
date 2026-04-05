@@ -1,5 +1,9 @@
 # Release Notes
 
+## 1.9.1.38 - 2026-04-03
+- Improved HW preset switching latency (especially HW preset 1) by caching hardware-preset responses even when they arrive through the normal preset-response path.
+- Prevents repeated fallback "get current preset" fetches for HW1 and makes repeated HW1 switches behave closer to HW2/3/4.
+
 ## 1.9.1.37 - 2026-04-03
 - Fixed slower profile metadata updates when switching to HW preset 1 by making HW preset update paths use the Spark-reported preset number directly instead of relying on stale pending preset state.
 - Fixed hardware-preset cache lookup during HW preset responses to always read from the HW bank (`bank 0`), preventing delayed fallbacks to extra preset fetches.
