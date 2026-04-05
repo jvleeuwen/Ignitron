@@ -402,6 +402,12 @@ void SparkPresetControl::updateFromSparkResponsePreset(bool isSpecial) {
         DEBUG_PRINTLN("Updating activePreset...");
         activePreset_ = statusObject.currentPreset();
         updatePendingWithActive();
+        // Persist HW preset responses received via the normal path so future
+        // switches can use cache immediately (notably HW preset 1).
+        if (activeBank_ == 0 && activePresetNum_ >= 1) {
+            int hwPresetNumber = activeHWBank_ * PRESETS_PER_BANK + activePresetNum_;
+            presetBuilder.insertHWPreset(hwPresetNumber - 1, activePreset_);
+        }
     }
     if (isSpecial) {
         DEBUG_PRINTF("Storing preset %d into cache.\n", presetNumber + 1);
